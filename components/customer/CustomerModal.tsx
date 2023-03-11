@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { Dispatch, SetStateAction } from "react";
 import TextField from "@mui/material/TextField";
+import { useState, useEffect } from "react";
 
 const style = {
   position: "absolute" as "absolute",
@@ -34,8 +35,6 @@ export default function PostModal({
       let newConsumer = {
         name: customerName,
         price_unit: customerPriceUnit,
-        tax1: 5,
-        tax2: 10,
       };
       window
         .fetch("/api/customer", {
@@ -77,7 +76,7 @@ export default function PostModal({
         />
         <TextField
           required
-          id="customer_tax1"
+          id="price_unit"
           label="Valor x hora"
           variant="outlined"
           onChange={(e) => (customerPriceUnit = e.target.value)}

@@ -21,7 +21,6 @@ export default function CustomerCard({
   function handleChange(model_id: any, e: any) {
     let isChecked = e.target.checked;
     // do whatever you want with isChecked value
-    console.log(checkedList.get(model_id));
     if (checkedList.get(model_id) == undefined)
       setCheckedList(new Map(checkedList.set(model_id, isChecked)));
     else {
@@ -58,22 +57,6 @@ export default function CustomerCard({
         />
         <CardContent>
           <ul>
-            <Typography
-              component="li"
-              variant="subtitle1"
-              align="center"
-              key={consumer.tax1}
-            >
-              tax 1: {consumer.tax1}
-            </Typography>
-            <Typography
-              component="li"
-              variant="subtitle1"
-              align="center"
-              key={consumer.tax2}
-            >
-              tax 2: {consumer.tax2}
-            </Typography>
             <Typography
               component="li"
               variant="subtitle1"

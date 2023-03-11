@@ -1,8 +1,6 @@
 type TConsumer = {
   id: number;
   name: string;
-  tax1: number;
-  tax2: number;
   price_unit: number;
   invoices: Array[TInvoice]
 };
@@ -12,9 +10,25 @@ type TInvoice = {
   number: number
   reason: string
   subtotal: number
-  total: number
+  tax1: number;
+  tax2: number;
   created: Date
   updated: Date
+}
+
+type TFile = {
+  id: number
+  s3_xlsx_url: string
+  s3_pdf_url: string
+  created: Date
+  invoice_id: number
+}
+
+type TGlobal = {
+  id: number
+  name: str
+  value: str
+  created: Date
 }
 
 type Props = {

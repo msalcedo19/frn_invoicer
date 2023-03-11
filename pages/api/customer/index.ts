@@ -8,7 +8,7 @@ export default async function handler(
   if (req.method === "POST") {
     // Process a POST request
     const postData = async () => {
-      const response = await fetch("http://127.0.0.1:8000/customer", {
+      const response = await fetch("http://127.0.0.1:8000/customer/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export default async function handler(
   } else {
     // Handle any other HTTP method
     const getData = async () => {
-      const response = await fetch("http://127.0.0.1:8000/customer", {
+      const response = await fetch("http://127.0.0.1:8000/customer/", {
         method: "GET",
       });
       return response.json();

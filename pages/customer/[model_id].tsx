@@ -11,35 +11,75 @@ export default function CustomerDetail() {
   const [checkedList, setCheckedList] = useState<Map<number, boolean>>(
     new Map()
   );
-  const [customer, setCustomer] = useState<TConsumer>();
+  const [invoices, setInvoices] = useState<TInvoice[]>([]);
   const {
     query: { model_id },
   } = useRouter();
   const [file, setFile] = useState<Blob>();
 
+  const [tax_1, setTax1] = useState<TGlobal>();
+  const [tax_2, setTax2] = useState<TGlobal>();
+
   useEffect(() => {
     window
-      .fetch(`/api/customer/${model_id}`)
+      .fetch(`/api/invoice/${model_id}`)
       .then((response) => response.json())
       .then((data) => {
         //console.log(data);
         console.log(data);
-        setCustomer(data);
+        setInvoices(data);
+      });
+
+    window
+      .fetch(`/api/global/tax_1`)
+      .then((response) => response.json())
+      .then((data) => {
+        setTax1(data);
+      });
+
+    window
+      .fetch(`/api/global/tax_2`)
+      .then((response) => response.json())
+      .then((data) => {
+        setTax2(data);
       });
   }, [model_id]);
 
   function postFile() {
     if (file) {
-      const info_data = new FormData();
-      info_data.append("file", file);
+      let newInvoice = {
+        reason: "Cleaning Services",
+        subtotal: 0,
+        tax_1: tax_1 ? +tax_1.value : undefined,
+        tax_2: tax_2 ? +tax_2.value : undefined,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+        customer_id: model_id ? +model_id : undefined
+      };
+      console.log(newInvoice)
       window
-        .fetch("/api/file", {
+        .fetch(`/api/invoice/`, {
           method: "POST",
-          body: info_data
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newInvoice),
         })
         .then((response) => response.json())
-        .then((data) => {
-            console.log(data)
+        .then((data: TInvoice) => {
+          console.log(data);
+          let info_data = new FormData();
+          info_data.append("invoice_id", data.id.toString());
+          info_data.append("file", file);
+          window
+            .fetch(`/api/file_manage/`, {
+              method: "POST",
+              body: info_data,
+            })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+            });
         });
     }
   }
@@ -55,8 +95,8 @@ export default function CustomerDetail() {
     <Fragment>
       <Container maxWidth="md" component="main">
         <Grid container spacing={5} alignItems="flex-end">
-          {customer != undefined && customer.invoices != undefined ? (
-            customer.invoices.map((invoice: TInvoice) => (
+          {invoices != undefined && invoices.length > 0 ? (
+            invoices.map((invoice: TInvoice) => (
               <InvoiceCard
                 key={invoice.id}
                 invoice={invoice}
@@ -70,7 +110,7 @@ export default function CustomerDetail() {
         </Grid>
         <Button variant="contained" component="label">
           Upload
-          <input hidden type="file" name="myFile"  onChange={uploadToClient}/>
+          <input hidden type="file" name="myFile" onChange={uploadToClient} />
         </Button>
         <Button variant="contained" component="label" onClick={postFile}>
           Push
