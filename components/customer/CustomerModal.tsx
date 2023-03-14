@@ -23,8 +23,8 @@ export default function PostModal({
   open,
   handleClose,
 }: {
-  consumerList: TConsumer[];
-  setConsumerList: Dispatch<SetStateAction<TConsumer[]>>;
+  consumerList: TCustomer[];
+  setConsumerList: Dispatch<SetStateAction<TCustomer[]>>;
   open: boolean;
   handleClose: () => void;
 }) {

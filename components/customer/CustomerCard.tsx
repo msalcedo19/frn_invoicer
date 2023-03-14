@@ -13,10 +13,12 @@ export default function CustomerCard({
   consumer,
   checkedList,
   setCheckedList,
+  deleteOp,
 }: {
-  consumer: TConsumer;
+  consumer: TCustomer;
   checkedList: Map<number, boolean>;
   setCheckedList: Dispatch<SetStateAction<Map<number, boolean>>>;
+  deleteOp: boolean
 }) {
   function handleChange(model_id: any, e: any) {
     let isChecked = e.target.checked;
@@ -46,13 +48,13 @@ export default function CustomerCard({
                 : theme.palette.grey[700],
           }}
           action={
-            <Checkbox
+            deleteOp ? <Checkbox
               checked={checkedList.get(consumer.id) == true ? true : false}
               inputProps={{
                 "aria-label": "Checkbox A",
               }}
               onChange={(e) => handleChange(consumer.id, e)}
-            />
+            /> : <></>
           }
         />
         <CardContent>
@@ -63,7 +65,7 @@ export default function CustomerCard({
               align="center"
               key={consumer.price_unit}
             >
-              $ hora: {consumer.price_unit}
+              Precio hora: ${consumer.price_unit}
             </Typography>
           </ul>
         </CardContent>

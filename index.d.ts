@@ -1,4 +1,4 @@
-type TConsumer = {
+type TCustomer = {
   id: number;
   name: string;
   price_unit: number;
@@ -14,6 +14,7 @@ type TInvoice = {
   tax2: number;
   created: Date
   updated: Date
+  customer_id: number
 }
 
 type TFile = {

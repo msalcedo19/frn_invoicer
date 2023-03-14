@@ -14,16 +14,16 @@ export default function Navbar() {
     >
       <Toolbar sx={{ flexWrap: "wrap" }}>
         <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-          Company name
+          Invoicer
         </Typography>
         <nav>
           <Link
             variant="button"
             color="text.primary"
-            href="#"
+            href="/customer"
             sx={{ my: 1, mx: 1.5 }}
           >
-            Features
+            Contratos
           </Link>
           <Link
             variant="button"
@@ -31,7 +31,7 @@ export default function Navbar() {
             href="#"
             sx={{ my: 1, mx: 1.5 }}
           >
-            Enterprise
+            Variables
           </Link>
           <Link
             variant="button"
@@ -39,7 +39,7 @@ export default function Navbar() {
             href="#"
             sx={{ my: 1, mx: 1.5 }}
           >
-            Support
+            Reportar
           </Link>
         </nav>
         <Button href="#" variant="outlined" sx={{ my: 1, mx: 1.5 }}>

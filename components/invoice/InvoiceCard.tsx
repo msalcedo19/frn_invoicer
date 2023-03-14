@@ -13,10 +13,12 @@ export default function InvoiceCard({
   invoice,
   checkedList,
   setCheckedList,
+  deleteOp,
 }: {
-    invoice: TInvoice;
+  invoice: TInvoice;
   checkedList: Map<number, boolean>;
   setCheckedList: Dispatch<SetStateAction<Map<number, boolean>>>;
+  deleteOp: boolean;
 }) {
   function handleChange(model_id: any, e: any) {
     let isChecked = e.target.checked;
@@ -47,38 +49,32 @@ export default function InvoiceCard({
                 : theme.palette.grey[700],
           }}
           action={
-            <Checkbox
-              checked={checkedList.get(invoice.id) == true ? true : false}
-              inputProps={{
-                "aria-label": "Checkbox A",
-              }}
-              onChange={(e) => handleChange(invoice.id, e)}
-            />
+            deleteOp ? (
+              <Checkbox
+                checked={checkedList.get(invoice.id) == true ? true : false}
+                inputProps={{
+                  "aria-label": "Checkbox A",
+                }}
+                onChange={(e) => handleChange(invoice.id, e)}
+              />
+            ) : (
+              <></>
+            )
           }
         />
         <CardContent>
           <ul>
-            <Typography
-              component="li"
-              variant="subtitle1"
-              align="center"
-            >
+            <Typography component="li" variant="subtitle1" align="center">
               Razon: {invoice.reason}
             </Typography>
-            <Typography
-              component="li"
-              variant="subtitle1"
-              align="center"
-            >
+            <Typography component="li" variant="subtitle1" align="center">
               Fecha de creación: {invoice.created}
             </Typography>
           </ul>
         </CardContent>
         <CardActions>
           <Button fullWidth variant="contained">
-            <Link href={`/invoice/${invoice.id}`}>
-              Ver
-            </Link>
+            <Link href={`/invoice/${invoice.id}`}>Ver</Link>
           </Button>
         </CardActions>
       </Card>

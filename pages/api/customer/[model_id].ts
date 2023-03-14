@@ -10,8 +10,18 @@ export default async function handler(
   res: NextApiResponse<Consumer>
 ) {
   const model_id = req.query.model_id;
-  if (req.method === "POST") {
-    // Process a POST request
+  if (req.method === "DELETE") {
+    const getData = async () => {
+      const response = await fetch(
+        `http://127.0.0.1:8000/customer/${model_id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      return response.json();
+    };
+    const data = await getData()
+    res.status(200).json(data);
   } else {
     // Handle any other HTTP method
     const getData = async () => {
