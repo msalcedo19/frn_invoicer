@@ -1,13 +1,51 @@
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import { Card, CardContent, Typography } from "@mui/material";
 import { Dispatch, SetStateAction } from "react";
+
+const styles = {
+  card: {
+    maxWidth: 345,
+    margin: "auto",
+    marginBottom: 20,
+    position: "relative",
+    overflow: "visible",
+    boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+    borderRadius: "10px",
+  },
+  content: {
+    paddingBottom: "16px !important",
+  },
+  title: {
+    fontWeight: "bold",
+    fontSize: "20px",
+    marginBottom: "8px",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+  },
+  subtitle: {
+    color: "gray",
+    fontSize: "16px",
+    marginBottom: "8px",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+  },
+  checkbox: {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+  },
+  actions: {
+    justifyContent: "flex-end",
+    borderTop: "1px solid #ccc",
+    paddingTop: "10px",
+  },
+};
 
 export default function CustomerCard({
   consumer,
@@ -18,7 +56,7 @@ export default function CustomerCard({
   consumer: TCustomer;
   checkedList: Map<number, boolean>;
   setCheckedList: Dispatch<SetStateAction<Map<number, boolean>>>;
-  deleteOp: boolean
+  deleteOp: boolean;
 }) {
   function handleChange(model_id: any, e: any) {
     let isChecked = e.target.checked;
@@ -31,49 +69,29 @@ export default function CustomerCard({
     }
   }
   return (
-    <Grid
-      item
-      xs={12}
-      //sm={consumer.title === "Enterprise" ? 12 : 6}
-      md={4}
-    >
-      <Card>
-        <CardHeader
-          title={consumer.name}
-          titleTypographyProps={{ align: "center" }}
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === "light"
-                ? theme.palette.grey[200]
-                : theme.palette.grey[700],
-          }}
-          action={
-            deleteOp ? <Checkbox
-              checked={checkedList.get(consumer.id) == true ? true : false}
-              inputProps={{
-                "aria-label": "Checkbox A",
-              }}
-              onChange={(e) => handleChange(consumer.id, e)}
-            /> : <></>
-          }
-        />
-        <CardContent>
-          <ul>
-            <Typography
-              component="li"
-              variant="subtitle1"
-              align="center"
-              key={consumer.price_unit}
-            >
-              Precio hora: ${consumer.price_unit}
-            </Typography>
-          </ul>
+    <Grid item xs={12} md={4}>
+      <Card style={styles.card}>
+        {deleteOp && (
+          <Checkbox
+            style={styles.checkbox}
+            checked={checkedList.get(consumer.id) == true ? true : false}
+            onChange={(e) => handleChange(consumer.id, e)}
+          />
+        )}
+        <CardContent style={styles.content}>
+          <Typography style={styles.title} variant="h5" component="h2">
+            {consumer.name}
+          </Typography>
+          <Typography style={styles.subtitle} variant="subtitle1" component="p">
+            ${consumer.price_unit}/hour
+          </Typography>
+          <Typography variant="body2" component="p">
+            {"5"} invoices
+          </Typography>
         </CardContent>
-        <CardActions>
-          <Button fullWidth variant="contained">
-            <Link href={`/customer/${consumer.id}`}>
-              Facturas
-            </Link>
+        <CardActions style={styles.actions}>
+          <Button size="small">
+            <Link href={`/customer/${consumer.id}`}>Facturas</Link>
           </Button>
         </CardActions>
       </Card>

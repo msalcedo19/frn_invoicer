@@ -14,6 +14,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import PostFileModal from "@/components/file/FileModal";
 
@@ -75,7 +76,7 @@ export default function CustomerDetail() {
         handleClose={handleClose}
         reload={reload}
       />
-      <Container maxWidth="md" component="main">
+      <Container maxWidth="md" component="main" sx={{marginTop: "5%"}}>
         <Grid container spacing={5} alignItems="flex-end">
           {invoices != undefined && invoices.length > 0 ? (
             invoices.map((invoice: TInvoice) => (
@@ -92,6 +93,7 @@ export default function CustomerDetail() {
           )}
         </Grid>
         <Container sx={{ mt: "100px", width: "100%", textAlign: "center" }}>
+          {invoices.length == 0 && <Typography>Aún no has generado ninguna factura</Typography>}
           <OptionsButton
             function_1={delete_invoice}
             function_2={() => setDeleteOp(false)}

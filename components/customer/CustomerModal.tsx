@@ -1,40 +1,30 @@
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
+import { SetStateAction, useState, Dispatch } from "react";
 import Modal from "@mui/material/Modal";
-import { Dispatch, SetStateAction } from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
-import { useState, useEffect } from "react";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-export default function PostModal({
-  consumerList,
-  setConsumerList,
-  open,
-  handleClose,
-}: {
-  consumerList: TCustomer[];
-  setConsumerList: Dispatch<SetStateAction<TCustomer[]>>;
+interface ModalProps {
+  reload: () => void;
   open: boolean;
   handleClose: () => void;
-}) {
-  let customerName: string | undefined;
-  let customerPriceUnit: string | undefined;
+}
+
+export default function PostModal(props: ModalProps) {
+  const { open, handleClose } = props;
+  const [name, setName] = useState("");
+  const [hourlyCost, setHourlyCost] = useState("");
+  const [to, setTo] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+
   function postCostumer() {
-    if (customerName && customerPriceUnit) {
+    if (name && hourlyCost) {
       let newConsumer = {
-        name: customerName,
-        price_unit: customerPriceUnit,
+        name: name,
+        price_unit: Number(hourlyCost),
       };
       window
         .fetch("/api/customer", {
@@ -46,44 +36,72 @@ export default function PostModal({
         })
         .then((response) => response.json())
         .then((data) => {
-          consumerList.push(data);
-          setConsumerList(consumerList);
+          props.reload()
           handleClose();
-          customerName = undefined;
-          customerPriceUnit = undefined;
+          setName("");
+          setHourlyCost("");
         });
     }
   }
 
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  };
+
+  const handleHourlyCostChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setHourlyCost(event.target.value);
+  };
+
+  const handleToChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTo(event.target.value);
+  };
+
+  const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAddress(event.target.value);
+  };
+
+  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(event.target.value);
+  };
+
+  const handleCreateClick = () => {
+    //handleCreate(name, hourlyCost, to, address, phone);
+    postCostumer()
+    handleClose();
+  };
+
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box component="form" sx={style}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          Text in a modal
+    <Modal open={open} onClose={handleClose}>
+      <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, bgcolor: "background.paper", boxShadow: 24, p: 4 }}>
+      <Typography variant="h6" gutterBottom>
+          Crear nueva empresa/contrato
         </Typography>
-        <TextField
-          required
-          id="customer_name"
-          label="Nombre"
-          variant="outlined"
-          helperText="Nombre del nuevo contrato/empresa"
-          onChange={(e) => (customerName = e.target.value)}
-        />
-        <TextField
-          required
-          id="price_unit"
-          label="Valor x hora"
-          variant="outlined"
-          onChange={(e) => (customerPriceUnit = e.target.value)}
-        />
-        <Button variant="contained" fullWidth onClick={postCostumer}>
-          Crear
-        </Button>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField label="Nombre" fullWidth value={name} onChange={handleNameChange}
+          helperText="Nombre del nuevo contrato/empresa" />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField label="Costo por hora" fullWidth value={hourlyCost} onChange={handleHourlyCostChange} />
+          </Grid>
+        </Grid>
+        <Box sx={{ my: 2 }}>
+          <hr />
+        </Box>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField label="To" fullWidth value={to} onChange={handleToChange} />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField label="Address" fullWidth value={address} onChange={handleAddressChange} />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField label="Phone" fullWidth value={phone} onChange={handlePhoneChange} />
+          </Grid>
+        </Grid>
+        <Box sx={{ my: 2 }}>
+          <Button variant="contained" onClick={handleCreateClick}>Crear</Button>
+        </Box>
       </Box>
     </Modal>
   );

@@ -4,47 +4,55 @@ import AppBar from "@mui/material/AppBar";
 import Link from "@mui/material/Link";
 import Toolbar from "@mui/material/Toolbar";
 
+const styles = {
+  appBar: {
+    backgroundColor: "#212121",
+    boxShadow: "none",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+  },
+  toolbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "0 20px",
+  },
+  logo: {
+    fontWeight: "bold",
+    fontSize: "24px",
+    letterSpacing: "2px",
+    color: "#fff",
+    textDecoration: "none",
+  },
+  navLink: {
+    fontWeight: "bold",
+    color: "#fff",
+    margin: "0 10px",
+    "&:hover": {
+      color: "#212121",
+      backgroundColor: "#fff",
+      borderRadius: "5px",
+    },
+  },
+};
+
 export default function Navbar() {
   return (
-    <AppBar
-      position="static"
-      color="default"
-      elevation={0}
-      sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}`, mb: 8, }}
-    >
-      <Toolbar sx={{ flexWrap: "wrap" }}>
-        <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
+    <AppBar position="static" style={styles.appBar}>
+      <Toolbar style={styles.toolbar}>
+        <Typography variant="h6" component="a" href="/" style={styles.logo}>
           Invoicer
         </Typography>
-        <nav>
-          <Link
-            variant="button"
-            color="text.primary"
-            href="/customer"
-            sx={{ my: 1, mx: 1.5 }}
-          >
-            Contratos
-          </Link>
-          <Link
-            variant="button"
-            color="text.primary"
-            href="#"
-            sx={{ my: 1, mx: 1.5 }}
-          >
-            Variables
-          </Link>
-          <Link
-            variant="button"
-            color="text.primary"
-            href="#"
-            sx={{ my: 1, mx: 1.5 }}
-          >
-            Reportar
-          </Link>
-        </nav>
-        <Button href="#" variant="outlined" sx={{ my: 1, mx: 1.5 }}>
-          Login
-        </Button>
+        <div>
+          <Button style={styles.navLink}>
+            <Link href="/customer">Contratos</Link>
+          </Button>
+          <Button style={styles.navLink}>
+            <Link href="#">Variables</Link>
+          </Button>
+          <Button style={styles.navLink}>
+            <Link href="#">Reportar</Link>
+          </Button>
+        </div>
       </Toolbar>
     </AppBar>
   );

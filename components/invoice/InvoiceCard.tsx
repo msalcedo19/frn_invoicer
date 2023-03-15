@@ -23,7 +23,6 @@ export default function InvoiceCard({
   function handleChange(model_id: any, e: any) {
     let isChecked = e.target.checked;
     // do whatever you want with isChecked value
-    console.log(checkedList.get(model_id));
     if (checkedList.get(model_id) == undefined)
       setCheckedList(new Map(checkedList.set(model_id, isChecked)));
     else {
@@ -31,17 +30,21 @@ export default function InvoiceCard({
       setCheckedList(new Map(checkedList));
     }
   }
+
   return (
     <Grid
       item
       xs={12}
-      //sm={consumer.title === "Enterprise" ? 12 : 6}
+      sm={6}
       md={4}
+      sx={{ mb: 2 }}
     >
-      <Card>
+      <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <CardHeader
-          title={invoice.total}
-          titleTypographyProps={{ align: "center" }}
+          title={"#" + invoice.id.toString()}
+          titleTypographyProps={{ align: "center", variant: "h5" }}
+          subheaderTypographyProps={{ align: "center" }}
+          subheader={invoice.reason}
           sx={{
             backgroundColor: (theme) =>
               theme.palette.mode === "light"
@@ -62,19 +65,18 @@ export default function InvoiceCard({
             )
           }
         />
-        <CardContent>
-          <ul>
-            <Typography component="li" variant="subtitle1" align="center">
-              Razon: {invoice.reason}
-            </Typography>
-            <Typography component="li" variant="subtitle1" align="center">
-              Fecha de creación: {invoice.created}
-            </Typography>
-          </ul>
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography component="div" variant="body2" align="center">
+            <ul>
+              <li>
+                <strong>Fecha de creación:</strong> {new Date(invoice.created).toISOString().split("T")[0]}
+              </li>
+            </ul>
+          </Typography>
         </CardContent>
         <CardActions>
           <Button fullWidth variant="contained">
-            <Link href={`/invoice/${invoice.id}`}>Ver</Link>
+            <Link href={`/invoice/${invoice.id}`}>Ver detalles</Link>
           </Button>
         </CardActions>
       </Card>

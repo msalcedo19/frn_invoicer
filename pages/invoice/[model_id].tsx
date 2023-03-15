@@ -62,7 +62,7 @@ export default function CustomerDetail() {
         handleClose={handleClose}
         reload={reload}
       />
-      <Container maxWidth="md" component="main">
+      <Container maxWidth="md" component="main" sx={{marginTop: "5%"}}>
         <Grid container spacing={5} alignItems="flex-end">
           {files != undefined &&
             files.length > 0 &&

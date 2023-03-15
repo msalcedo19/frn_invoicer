@@ -16,6 +16,25 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import { Typography } from "@mui/material";
 
+const styles = {
+  container: {
+    marginTop: '100px',
+    width: '100%',
+    textAlign: 'center',
+  },
+  optionsButton: {
+    marginBottom: '50px',
+  },
+  button: {
+    color: 'white',
+    fontWeight: 'bold',
+    '&:hover': {
+      color: 'black',
+      backgroundColor: 'white',
+    },
+  },
+};
+
 function CustomerContent() {
   const [consumerList, setConsumerList] = useState<TCustomer[]>([]);
   const [checkedList, setCheckedList] = useState<Map<number, boolean>>(
@@ -66,12 +85,11 @@ function CustomerContent() {
   return (
     <Fragment>
       <PostModal
-        consumerList={consumerList}
-        setConsumerList={setConsumerList}
+        reload={reload}
         open={open}
         handleClose={handleClose}
       />
-      <Container maxWidth="md" component="main">
+      <Container maxWidth="md" component="main" sx={{marginTop: "5%"}}>
         <Grid container spacing={5} alignItems="flex-end">
           {consumerList.map((consumer) => (
             <CustomerCard
@@ -83,12 +101,13 @@ function CustomerContent() {
             />
           ))}
         </Grid>
-        <Container sx={{ mt: "100px", width: "100%", textAlign: "center" }}>
+        <Container sx={styles.container}>
           {consumerList.length == 0 && <Typography>Aún no has creado ningún contrato</Typography>}
           <OptionsButton
             function_1={delete_customer}
             function_2={() => setDeleteOp(false)}
             check_or_cancel={deleteOp}
+            sx={styles.optionsButton}
           >
             <List>
               <ListItem key={"new_customer"} disablePadding>

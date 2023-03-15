@@ -7,11 +7,10 @@ type TCustomer = {
 
 type TInvoice = {
   id: number
-  number: number
   reason: string
   subtotal: number
-  tax1: number;
-  tax2: number;
+  tax_1: number;
+  tax_2: number;
   created: Date
   updated: Date
   customer_id: number
