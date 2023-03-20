@@ -1,9 +1,9 @@
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
-import InvoiceCard from "@/components/invoice/InvoiceCard";
+import InvoiceCard from "@/components/Invoice/InvoiceCard";
 
 import Button from "@mui/material/Button";
-import { useEffect, Fragment, useState } from "react";
+import { useEffect, Fragment, useState, Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/router";
 import { Blob } from "buffer";
 
@@ -16,7 +16,14 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import PostFileModal from "@/components/file/FileModal";
+import PostInvoiceModal from "@/components/Invoice/InvoiceModal";
+
+import {
+  breadcrumbAction,
+  BACK_EVENT,
+  INVOICE,
+} from "@/src/actions/breadcrumb";
+import { useDispatch } from "react-redux";
 
 export default function CustomerDetail() {
   const [checkedList, setCheckedList] = useState<Map<number, boolean>>(
@@ -24,61 +31,77 @@ export default function CustomerDetail() {
   );
   const [invoices, setInvoices] = useState<TInvoice[]>([]);
   const {
-    query: { model_id },
+    query: { contract_id },
   } = useRouter();
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [deleteOp, setDeleteOp] = useState<boolean>(false);
+  const dispatch = useDispatch();
 
   function delete_invoice() {
+    let urls: Array<Promise<Response>> = [];
     checkedList.forEach(
       (value: boolean, key: number, map: Map<number, boolean>) => {
-        window
-          .fetch(`/api/invoice/${key}`, {
+        urls.push(
+          window.fetch(`/api/invoice/${key}`, {
             method: "DELETE",
           })
-          .then((response) => {
-            console.log(response);
-          });
+        );
       }
     );
-    reload();
-    setCheckedList(new Map());
-    setDeleteOp(false);
+    Promise.all(urls).then((value) => {
+      reload();
+      setCheckedList(new Map());
+      setDeleteOp(false);
+    });
   }
 
   useEffect(() => {
+    dispatch(
+      breadcrumbAction(
+        BACK_EVENT,
+        {
+          href: "",
+          value: "",
+          active: true,
+        },
+        INVOICE
+      )
+    );
+
     window
-      .fetch(`/api/invoice/${model_id}`)
+      .fetch(`/api/contract/${contract_id}`)
       .then((response) => response.json())
       .then((data) => {
-        setInvoices(data);
+        if (data && data["invoices"]) setInvoices(data["invoices"]);
       });
-  }, [model_id]);
+  }, [contract_id]);
 
   function reload() {
     window
-      .fetch(`/api/invoice/${model_id}`)
+      .fetch(`/api/contract/${contract_id}`)
       .then((response) => response.json())
       .then((data) => {
-        setInvoices(data);
+        if (data && data["invoices"]) setInvoices(data["invoices"]);
       });
   }
 
   return (
     <Fragment>
-      <PostFileModal
-        model_id={model_id}
+      <PostInvoiceModal
+        model_id={undefined}
+        contract_id={contract_id}
         create_new_invoice={true}
         open={open}
         handleClose={handleClose}
         reload={reload}
       />
-      <Container maxWidth="md" component="main" sx={{marginTop: "5%"}}>
+      <Container sx={{ marginTop: "5%" }}>
         <Grid container spacing={5} alignItems="flex-end">
-          {invoices != undefined && invoices.length > 0 ? (
+          {invoices != undefined &&
+            invoices.length > 0 &&
             invoices.map((invoice: TInvoice) => (
               <InvoiceCard
                 key={invoice.id}
@@ -87,13 +110,12 @@ export default function CustomerDetail() {
                 setCheckedList={setCheckedList}
                 deleteOp={deleteOp}
               />
-            ))
-          ) : (
-            <></>
-          )}
+            ))}
         </Grid>
         <Container sx={{ mt: "100px", width: "100%", textAlign: "center" }}>
-          {invoices.length == 0 && <Typography>Aún no has generado ninguna factura</Typography>}
+          {invoices && invoices.length == 0 && (
+            <Typography>Aún no has generado ninguna factura</Typography>
+          )}
           <OptionsButton
             function_1={delete_invoice}
             function_2={() => setDeleteOp(false)}
@@ -105,7 +127,7 @@ export default function CustomerDetail() {
                   <ListItemIcon>
                     <InboxIcon />
                   </ListItemIcon>
-                  <ListItemText primary={"Subir archivo"} />
+                  <ListItemText primary={"Crear nueva factura"} />
                 </ListItemButton>
               </ListItem>
               <ListItem key={"delete_invoice"} disablePadding>

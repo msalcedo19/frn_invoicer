@@ -16,6 +16,7 @@ export default function OptionsButton({
   function_1,
   function_2,
 }: {
+  children: any;
   check_or_cancel: boolean;
   function_1: () => void;
   function_2: () => void;

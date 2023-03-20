@@ -9,6 +9,8 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
 
+import { useDispatch } from "react-redux";
+import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
 export default function InvoiceCard({
   invoice,
   checkedList,
@@ -31,17 +33,22 @@ export default function InvoiceCard({
     }
   }
 
+  const dispatch = useDispatch();
+  const handleClick = () => {
+    dispatch(
+      breadcrumbAction(CHECK_ACTION, {
+        href: `/invoice/${invoice.id}`,
+        value: `${invoice.id}`,
+        active: true,
+      }, undefined)
+    );
+  };
+
   return (
-    <Grid
-      item
-      xs={12}
-      sm={6}
-      md={4}
-      sx={{ mb: 2 }}
-    >
+    <Grid item xs={12} sm={6} md={4} sx={{ mb: 2 }}>
       <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <CardHeader
-          title={"#" + invoice.id.toString()}
+          title={"#" + invoice.number_id.toString()}
           titleTypographyProps={{ align: "center", variant: "h5" }}
           subheaderTypographyProps={{ align: "center" }}
           subheader={invoice.reason}
@@ -69,14 +76,15 @@ export default function InvoiceCard({
           <Typography component="div" variant="body2" align="center">
             <ul>
               <li>
-                <strong>Fecha de creación:</strong> {new Date(invoice.created).toISOString().split("T")[0]}
+                <strong>Fecha de creación:</strong>{" "}
+                {new Date(invoice.created).toISOString().split("T")[0]}
               </li>
             </ul>
           </Typography>
         </CardContent>
         <CardActions>
           <Button fullWidth variant="contained">
-            <Link href={`/invoice/${invoice.id}`}>Ver detalles</Link>
+            <Link href={`/invoice/${invoice.id}`} onClick={handleClick}>Ver detalles</Link>
           </Button>
         </CardActions>
       </Card>

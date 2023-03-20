@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
-import InvoiceCard from "@/components/invoice/InvoiceCard";
+import InvoiceCard from "@/components/Invoice/InvoiceCard";
 
 import Button from "@mui/material/Button";
 import { useEffect, Fragment, useState } from "react";
@@ -16,7 +16,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import PostFileModal from "@/components/file/FileModal";
+import PostInvoiceModal from "@/components/Invoice/InvoiceModal";
 
 export default function CustomerDetail() {
   const [checkedList, setCheckedList] = useState<Map<number, boolean>>(
@@ -33,51 +33,47 @@ export default function CustomerDetail() {
 
   useEffect(() => {
     window
-      .fetch(`/api/files/${model_id}`)
+      .fetch(`/api/invoice/${model_id}`)
       .then((response) => response.json())
       .then((data) => {
-        //console.log(data);
-        console.log(data);
-        setFiles(data);
+        if (data && data["files"]) setFiles(data["files"]);
       });
   }, [model_id]);
 
   function reload() {
     window
-      .fetch(`/api/files/${model_id}`)
+      .fetch(`/api/invoice/${model_id}`)
       .then((response) => response.json())
       .then((data) => {
-        //console.log(data);
-        console.log(data);
-        setFiles(data);
+        if (data && data["files"]) setFiles(data["files"]);
       });
   }
 
   return (
     <Fragment>
-      <PostFileModal
-        model_id={files[0] && files[0].invoice_id.toString()}
+      <PostInvoiceModal
+        model_id={model_id}
+        contract_id={undefined}
         create_new_invoice={false}
         open={open}
         handleClose={handleClose}
         reload={reload}
       />
-      <Container maxWidth="md" component="main" sx={{marginTop: "5%"}}>
+      <Container sx={{ marginTop: "5%" }}>
         <Grid container spacing={5} alignItems="flex-end">
           {files != undefined &&
             files.length > 0 &&
             files.map((file: TFile) => <FilesRow key={file.id} file={file} />)}
         </Grid>
         <Container sx={{ mt: "100px", width: "100%", textAlign: "center" }}>
-          <OptionsButton
-          >
+          <OptionsButton>
             <List>
               <ListItem key={"upload_file"} disablePadding>
                 <ListItemButton onClick={handleOpen}>
                   <ListItemIcon>
                     <InboxIcon />
                   </ListItemIcon>
-                  <ListItemText primary={"Subir archivo"} />
+                  <ListItemText primary={"Generar nueva factura"} />
                 </ListItemButton>
               </ListItem>
               <ListItem key={"delete_file"} disablePadding>

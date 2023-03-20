@@ -2,8 +2,8 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import AddIcon from "@mui/icons-material/Add";
-import PostModal from "@/components/Customer/CustomerModal";
-import { useEffect, Fragment, useState } from "react";
+import PostContract from "@/components/Contract/ContractModal";
+import { useEffect, Fragment, useState, Dispatch, SetStateAction } from "react";
 
 import OptionsButton from "@/components/OptionsButton";
 import List from "@mui/material/List";
@@ -14,14 +14,17 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import { Typography } from "@mui/material";
-import CustomerCard from "@/components/Customer/CustomerCard";
+
+import { useRouter } from "next/router";
+import ContractCard from "@/components/Contract/ContractCard";
 
 import {
   breadcrumbAction,
   BACK_EVENT,
-  CUSTOMER,
+  CONTRACT,
 } from "@/src/actions/breadcrumb";
 import { useDispatch } from "react-redux";
+
 const styles = {
   container: {
     marginTop: "100px",
@@ -41,7 +44,7 @@ const styles = {
   },
 };
 
-export default function Customer() {
+export default function CustomerDetail() {
   const [objList, setObjList] = useState<TContract[]>([]);
   const [checkedList, setCheckedList] = useState<Map<number, boolean>>(
     new Map()
@@ -50,18 +53,20 @@ export default function Customer() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [deleteOp, setDeleteOp] = useState<boolean>(false);
+  const {
+    query: { customer_id },
+  } = useRouter();
   const dispatch = useDispatch();
 
   function delete_obj() {
     checkedList.forEach(
       (value: boolean, key: number, map: Map<number, boolean>) => {
         window
-          .fetch(`/api/customer/${key}`, {
+          .fetch(`/api/contract/${key}`, {
             method: "DELETE",
           })
           .then((response) => {
-            console.log(response);
-            reload();
+            reload(customer_id);
             setDeleteOp(false);
             setCheckedList(new Map());
           });
@@ -69,13 +74,15 @@ export default function Customer() {
     );
   }
 
-  function reload() {
-    window
-      .fetch(`/api/customer/`)
-      .then((response) => response.json())
-      .then((data) => {
-        setObjList(data);
-      });
+  function reload(p_model_id: string | string[] | undefined) {
+    if (p_model_id) {
+      window
+        .fetch(`/api/customer/${p_model_id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data && data["contracts"]) setObjList(data["contracts"]);
+        });
+    }
   }
 
   useEffect(() => {
@@ -83,25 +90,30 @@ export default function Customer() {
       breadcrumbAction(
         BACK_EVENT,
         {
-          href: "",
-          value: "",
+          href: ``,
+          value: ``,
           active: true,
         },
-        CUSTOMER
+        CONTRACT
       )
     );
-    reload();
+    reload(customer_id);
   }, []);
 
   return (
     <Fragment>
-      <PostModal reload={reload} open={open} handleClose={handleClose} />
+      <PostContract
+        customer_id={customer_id ? +customer_id : undefined}
+        reload={reload}
+        open={open}
+        handleClose={handleClose}
+      />
       <Container sx={{ marginTop: "5%" }}>
         <Grid container spacing={5} alignItems="flex-end">
           {objList.map((obj) => (
-            <CustomerCard
+            <ContractCard
               key={obj.id}
-              customer={obj}
+              contract={obj}
               checkedList={checkedList}
               setCheckedList={setCheckedList}
               deleteOp={deleteOp}
@@ -110,7 +122,7 @@ export default function Customer() {
         </Grid>
         <Container sx={styles.container}>
           {objList.length == 0 && (
-            <Typography>Aún no has creado ningún cliente</Typography>
+            <Typography>Aún no has creado ningún contrato</Typography>
           )}
           <OptionsButton
             function_1={delete_obj}
@@ -124,7 +136,7 @@ export default function Customer() {
                   <ListItemIcon>
                     <InboxIcon />
                   </ListItemIcon>
-                  <ListItemText primary={"Crear nuevo cliente"} />
+                  <ListItemText primary={"Crear nueva contrato"} />
                 </ListItemButton>
               </ListItem>
               <ListItem key={"delete_key"} disablePadding>
@@ -134,7 +146,7 @@ export default function Customer() {
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      "Eliminar cliente (Esto incluye todos los contratos asociados a este)"
+                      "Eliminar contrato (Esto incluye todas las facturas asociadas a este contrato)"
                     }
                   />
                 </ListItemButton>

@@ -1,17 +1,31 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Grid, Modal, Typography } from "@mui/material";
-import { Save as SaveIcon, Check as CheckIcon } from "@mui/icons-material";
+import TextField from "@mui/material/TextField";
+import InvoiceModalBillTo from "./InvoiceModalBillTo";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
+  contract_id: string | string[] | undefined;
   create_new_invoice: boolean;
   open: boolean;
   handleClose: () => void;
   reload: () => void;
 }
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 500,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
-const PostFileModal = ({
+const PostInvoiceModal = ({
   model_id,
+  contract_id,
   create_new_invoice,
   open,
   handleClose,
@@ -19,9 +33,13 @@ const PostFileModal = ({
 }: PostFileModalProps) => {
   const [file, setFile] = useState<Blob>();
   const [error, setError] = useState<boolean>(false);
+  const [invoice_id, setInvoiceId] = useState("");
 
   const [tax_1, setTax1] = useState<TGlobal>();
   const [tax_2, setTax2] = useState<TGlobal>();
+
+  const [billTos, setBillTos] = useState<TBillTo[]>([]);
+  const [billTo, setChooseBillTo] = useState<TBillTo>();
 
   const uploadToClient = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -44,20 +62,29 @@ const PostFileModal = ({
       .then((data) => {
         setTax2(data);
       });
+
+    window
+      .fetch(`/api/billTo/`)
+      .then((response) => response.json())
+      .then((data) => {
+        setBillTos(data);
+        if (data && data.length > 0) setChooseBillTo(data[0]);
+      });
   }, [model_id]);
 
   function postFile() {
-    if (file && create_new_invoice) {
+    if (create_new_invoice && contract_id && invoice_id && billTo) {
       let newInvoice = {
+        number_id: +invoice_id,
         reason: "Cleaning Services",
         subtotal: 0,
         tax_1: tax_1 ? +tax_1.value : undefined,
         tax_2: tax_2 ? +tax_2.value : undefined,
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
-        customer_id: model_id ? +model_id : undefined,
+        contract_id: contract_id,
+        bill_to_id: billTo.id,
       };
-
       window
         .fetch(`/api/invoice/`, {
           method: "POST",
@@ -73,8 +100,9 @@ const PostFileModal = ({
           return response.json();
         })
         .then((data: TInvoice) => {
-          if (data) {
+          if (file && data && data.id) {
             let info_data = new FormData();
+            model_id = data.id.toString();
             info_data.append("invoice_id", data.id.toString());
             info_data.append("file", file);
             window
@@ -90,9 +118,9 @@ const PostFileModal = ({
               })
               .then((data) => {
                 reload();
-                handleClose()
+                handleClose();
               });
-          } else {
+          } else if (!file) {
             setError(true);
           }
         });
@@ -113,21 +141,13 @@ const PostFileModal = ({
         })
         .then((data) => {
           reload();
-          handleClose()
+          handleClose();
         });
     }
   }
 
-  const style = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 500,
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
+  const handleSetInvoiceId = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInvoiceId(event.target.value);
   };
 
   return (
@@ -142,6 +162,23 @@ const PostFileModal = ({
           Subir archivo para procesar
         </Typography>
         <Grid container spacing={2} mt={2}>
+          {contract_id && (
+            <Grid item xs={12}>
+              <TextField
+                label="ID factura"
+                fullWidth
+                value={invoice_id}
+                onChange={handleSetInvoiceId}
+                helperText="Número factura"
+              />
+            </Grid>
+          )}
+          <Grid item xs={12}>
+            <InvoiceModalBillTo
+              billTos={billTos}
+              setChooseBillTo={setChooseBillTo}
+            />
+          </Grid>
           <Grid item xs={6}>
             <Button
               variant="contained"
@@ -158,9 +195,7 @@ const PostFileModal = ({
               />
             </Button>
             {file && (
-              <Typography mt={1}>
-                Archivo seleccionado: {file.name}
-              </Typography>
+              <Typography mt={1}>Archivo seleccionado: {file.name}</Typography>
             )}
           </Grid>
           <Grid item xs={6}>
@@ -186,4 +221,4 @@ const PostFileModal = ({
   );
 };
 
-export default PostFileModal;
+export default PostInvoiceModal;

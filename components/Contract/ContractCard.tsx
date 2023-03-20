@@ -8,6 +8,7 @@ import { Dispatch, SetStateAction } from "react";
 
 import { useDispatch } from "react-redux";
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
+
 const styles = {
   card: {
     maxWidth: 345,
@@ -49,13 +50,13 @@ const styles = {
   },
 };
 
-export default function CustomerCard({
-  customer,
+export default function ContractCard({
+  contract,
   checkedList,
   setCheckedList,
   deleteOp,
 }: {
-  customer: TCustomer;
+  contract: TContract;
   checkedList: Map<number, boolean>;
   setCheckedList: Dispatch<SetStateAction<Map<number, boolean>>>;
   deleteOp: boolean;
@@ -75,10 +76,10 @@ export default function CustomerCard({
   const handleClick = () => {
     dispatch(
       breadcrumbAction(CHECK_ACTION, {
-        href: `/customer/${customer.id}`,
-        value: `${customer.name}`,
+        href: `/contract/${contract.id}`,
+        value: `${contract.name}`,
         active: true,
-      }, undefined)
+      })
     );
   };
 
@@ -88,19 +89,25 @@ export default function CustomerCard({
         {deleteOp && (
           <Checkbox
             style={styles.checkbox}
-            checked={checkedList.get(customer.id) == true ? true : false}
-            onChange={(e) => handleChange(customer.id, e)}
+            checked={checkedList.get(contract.id) == true ? true : false}
+            onChange={(e) => handleChange(contract.id, e)}
           />
         )}
         <CardContent style={styles.content}>
           <Typography style={styles.title} variant="h5" component="h2">
-            {customer.name}
+            {contract.name}
+          </Typography>
+          <Typography style={styles.subtitle} variant="subtitle1" component="p">
+            ${contract.price_unit}/hour
+          </Typography>
+          <Typography variant="body2" component="p">
+            {"5"} invoices
           </Typography>
         </CardContent>
         <CardActions style={styles.actions}>
           <Button size="small">
-            <Link href={`/customer/${customer.id}`} onClick={handleClick}>
-              Contratos
+            <Link href={`/contract/${contract.id}`} onClick={handleClick}>
+              Facturas
             </Link>
           </Button>
         </CardActions>

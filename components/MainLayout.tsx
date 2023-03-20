@@ -1,13 +1,14 @@
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import React from "react";
-import Box from '@mui/material/Box';
+import Container from "@mui/material/Container";
 
 const MainLayout: React.FC<Props> = ({ children }) => {
- return (
+  return (
     <div>
       <Navbar />
-      {children}
+      <Container maxWidth="lg" component="main" sx={{ marginTop: "5%" }}>
+        {children}
+      </Container>
       <Footer />
     </div>
   );

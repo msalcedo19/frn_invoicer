@@ -1,13 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
-type Consumer = {
-  name: string;
-};
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Consumer>
+  res: NextApiResponse<TContract>
 ) {
   const model_id = req.query.model_id;
   if (req.method === "DELETE") {
