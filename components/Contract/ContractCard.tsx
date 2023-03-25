@@ -2,9 +2,10 @@ import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
 import Link from "next/link";
 import { Card, CardContent, Typography } from "@mui/material";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import { useDispatch } from "react-redux";
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
@@ -61,6 +62,35 @@ export default function ContractCard({
   setCheckedList: Dispatch<SetStateAction<Map<number, boolean>>>;
   deleteOp: boolean;
 }) {
+  const [isEditable, setIsEditable] = useState(false);
+  const [editedName, setEditedName] = useState(contract.name);
+
+  const handleNameChange = (e) => {
+    setEditedName(e.target.value);
+  };
+
+  const handleNameClick = () => {
+    setIsEditable(true);
+  };
+
+  const handleNameBlur = () => {
+    if (editedName != contract.name) {
+      fetch(`/api/contract/${contract.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: editedName }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setIsEditable(false);
+        });
+    }
+    setIsEditable(false);
+  };
+
   function handleChange(model_id: any, e: any) {
     let isChecked = e.target.checked;
     // do whatever you want with isChecked value
@@ -75,11 +105,15 @@ export default function ContractCard({
   const dispatch = useDispatch();
   const handleClick = () => {
     dispatch(
-      breadcrumbAction(CHECK_ACTION, {
-        href: `/contract/${contract.id}`,
-        value: `${contract.name}`,
-        active: true,
-      })
+      breadcrumbAction(
+        CHECK_ACTION,
+        {
+          href: `/contract/${contract.id}`,
+          value: `${contract.name}`,
+          active: true,
+        },
+        undefined
+      )
     );
   };
 
@@ -94,9 +128,25 @@ export default function ContractCard({
           />
         )}
         <CardContent style={styles.content}>
-          <Typography style={styles.title} variant="h5" component="h2">
-            {contract.name}
-          </Typography>
+          {isEditable ? (
+            <TextField
+              variant="standard"
+              fullWidth
+              value={editedName}
+              autoFocus={true}
+              onChange={handleNameChange}
+              onBlur={handleNameBlur}
+            />
+          ) : (
+            <Typography
+              variant="h5"
+              component="h2"
+              onClick={handleNameClick}
+              style={styles.title}
+            >
+              {editedName}
+            </Typography>
+          )}
           <Typography style={styles.subtitle} variant="subtitle1" component="p">
             ${contract.price_unit}/hour
           </Typography>

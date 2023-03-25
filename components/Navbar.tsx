@@ -44,10 +44,10 @@ export default function Navbar() {
         </Typography>
         <div>
           <Button style={styles.navLink}>
-            <Link href="/customer">Contratos</Link>
+            <Link href="/customer">Clientes</Link>
           </Button>
           <Button style={styles.navLink}>
-            <Link href="#">Variables</Link>
+            <Link href="/variable">Variables</Link>
           </Button>
           <Button style={styles.navLink}>
             <Link href="#">Reportar</Link>

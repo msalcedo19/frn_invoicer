@@ -34,6 +34,7 @@ const PostInvoiceModal = ({
   const [file, setFile] = useState<Blob>();
   const [error, setError] = useState<boolean>(false);
   const [invoice_id, setInvoiceId] = useState("");
+  const [reason, setReason] = useState("Cleaning Services");
 
   const [tax_1, setTax1] = useState<TGlobal>();
   const [tax_2, setTax2] = useState<TGlobal>();
@@ -76,7 +77,7 @@ const PostInvoiceModal = ({
     if (create_new_invoice && contract_id && invoice_id && billTo) {
       let newInvoice = {
         number_id: +invoice_id,
-        reason: "Cleaning Services",
+        reason: reason,
         subtotal: 0,
         tax_1: tax_1 ? +tax_1.value : undefined,
         tax_2: tax_2 ? +tax_2.value : undefined,
@@ -170,6 +171,16 @@ const PostInvoiceModal = ({
                 value={invoice_id}
                 onChange={handleSetInvoiceId}
                 helperText="Número factura"
+              />
+            </Grid>
+          )}
+          {contract_id && (
+            <Grid item xs={12}>
+              <TextField
+                label="Reason"
+                fullWidth
+                value={reason}
+                onChange={setReason}
               />
             </Grid>
           )}

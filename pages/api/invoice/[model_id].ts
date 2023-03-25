@@ -20,9 +20,9 @@ export default async function handler(
       );
       return response.json();
     };
-    const data = await getData()
+    const data = await getData();
     res.status(200).json(data);
-  } else {
+  } else if (req.method == "GET") {
     // Handle any other HTTP method
     const getData = async () => {
       const response = await fetch(
@@ -33,7 +33,23 @@ export default async function handler(
       );
       return response.json();
     };
-    const data = await getData()
+    const data = await getData();
+    res.status(200).json(data);
+  } else {
+    const postData = async () => {
+      const response = await fetch(
+        `http://127.0.0.1:8000/invoice/${model_id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(req.body),
+        }
+      );
+      return response.json();
+    };
+    const data = await postData();
     res.status(200).json(data);
   }
 }

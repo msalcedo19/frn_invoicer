@@ -1,12 +1,12 @@
 // reducer.ts
 
 import {
-  PUSH_ITEM,
   CHECK_ACTION,
   BACK_EVENT,
   CUSTOMER,
   CONTRACT,
   INVOICE,
+  RELOAD_EVENT,
   BreadcrumbAction,
 } from "../actions/breadcrumb";
 
@@ -32,28 +32,42 @@ const initialState: TBreadcrumbState = {
   lastBreadcrumb: [],
 };
 
-const reducer = (
+export const reducer = (
   state = initialState,
   action: BreadcrumbAction
 ): TBreadcrumbState => {
   let updatedBreadcrumbs: TBreadcrumbOptionState[] = [];
   switch (action.type) {
-    case PUSH_ITEM:
-      console.log(PUSH_ITEM);
-      return { ...state, options: [...state.options, action.payload] };
+    case RELOAD_EVENT:
+      console.log(RELOAD_EVENT);
+      if (Array.isArray(action.payload)) {
+        return {
+          ...state,
+          options: action.payload,
+          lastBreadcrumb: [
+            ...action.payload.filter(
+              (breadcrumb) => breadcrumb.value !== "Clientes"
+            ),
+          ],
+        };
+      }
+      return state;
     case CHECK_ACTION:
       console.log(CHECK_ACTION);
-      updatedBreadcrumbs = state.options.map((obj) => {
-        if (obj.active) {
-          return { ...obj, active: false };
-        }
-        return obj;
-      });
-      return {
-        ...state,
-        options: [...updatedBreadcrumbs, action.payload],
-        lastBreadcrumb: [...state.lastBreadcrumb, action.payload],
-      };
+      if (!Array.isArray(action.payload)) {
+        updatedBreadcrumbs = state.options.map((obj) => {
+          if (obj.active) {
+            return { ...obj, active: false };
+          }
+          return obj;
+        });
+        return {
+          ...state,
+          options: [...updatedBreadcrumbs, action.payload],
+          lastBreadcrumb: [...state.lastBreadcrumb, action.payload],
+        };
+      }
+      return state;
     case BACK_EVENT:
       console.log(BACK_EVENT);
       if (action.check == CUSTOMER && state.options.length < 2) return state;
@@ -88,5 +102,3 @@ const reducer = (
       return state;
   }
 };
-
-export default reducer;

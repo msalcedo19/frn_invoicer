@@ -2,10 +2,11 @@ import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
 import Link from "next/link";
 import { Card, CardContent, Typography } from "@mui/material";
-import { Dispatch, SetStateAction } from "react";
-
+import { Dispatch, SetStateAction, Fragment } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
 const styles = {
@@ -20,6 +21,7 @@ const styles = {
   },
   content: {
     paddingBottom: "16px !important",
+    textAlign: "center"
   },
   title: {
     fontWeight: "bold",
@@ -28,6 +30,7 @@ const styles = {
     textOverflow: "ellipsis",
     overflow: "hidden",
     whiteSpace: "nowrap",
+    cursor: "pointer",
   },
   subtitle: {
     color: "gray",
@@ -74,12 +77,45 @@ export default function CustomerCard({
   const dispatch = useDispatch();
   const handleClick = () => {
     dispatch(
-      breadcrumbAction(CHECK_ACTION, {
-        href: `/customer/${customer.id}`,
-        value: `${customer.name}`,
-        active: true,
-      }, undefined)
+      breadcrumbAction(
+        CHECK_ACTION,
+        {
+          href: `/customer/${customer.id}`,
+          value: `${customer.name}`,
+          active: true,
+        },
+        undefined
+      )
     );
+  };
+
+  const [isEditable, setIsEditable] = useState(false);
+  const [editedName, setEditedName] = useState(customer.name);
+
+  const handleNameChange = (e) => {
+    setEditedName(e.target.value);
+  };
+
+  const handleNameClick = () => {
+    setIsEditable(true);
+  };
+
+  const handleNameBlur = () => {
+    if (editedName != customer.name) {
+      fetch(`/api/customer/${customer.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: editedName }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setIsEditable(false);
+        });
+    } 
+    setIsEditable(false);
   };
 
   return (
@@ -93,9 +129,43 @@ export default function CustomerCard({
           />
         )}
         <CardContent style={styles.content}>
-          <Typography style={styles.title} variant="h5" component="h2">
-            {customer.name}
-          </Typography>
+          {isEditable ? (
+            <TextField
+              variant="standard"
+              fullWidth
+              value={editedName}
+              autoFocus={true}
+              onChange={handleNameChange}
+              onBlur={handleNameBlur}
+            />
+          ) : (
+            <Typography
+              variant="h5"
+              component="h2"
+              onClick={handleNameClick}
+              style={styles.title}
+            >
+              {editedName}
+            </Typography>
+          )}
+          {customer.contracts &&
+            ((customer.contracts.length > 0 && (
+              <Grid container spacing={2}>
+                {customer.contracts.map((contract, index) => (
+                  <Fragment key={contract.id}>
+                    <Grid item xs={6} sx={{ textAlign: "center" }}>
+                      <Typography variant="subtitle1">
+                        {contract.name}
+                      </Typography>
+                    </Grid>
+                  </Fragment>
+                ))}
+              </Grid>
+            )) || (
+              <Typography variant="subtitle1">
+                Aún no se han registrado contratos
+              </Typography>
+            ))}
         </CardContent>
         <CardActions style={styles.actions}>
           <Button size="small">

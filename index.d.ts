@@ -1,6 +1,7 @@
 type TCustomer = {
   id: number;
   name: string;
+  contracts: TContract[];
 };
 
 type TContract = {
@@ -36,6 +37,7 @@ type TGlobal = {
   name: str
   value: str
   created: Date
+  updated: Date
 }
 
 type TBillTo = {
@@ -43,7 +45,6 @@ type TBillTo = {
   to: string
   addr: string
   phone: string
-  invoice_id: number
   contract_id: number
 };
 
