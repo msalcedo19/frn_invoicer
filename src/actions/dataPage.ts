@@ -1,15 +1,16 @@
 // actions.ts
-import { TDataPageState } from "@/src/reducers/dataPage";
+import { TDataPageObj } from "@/src/reducers/dataPage";
 export const UPDATE_TITLE = "UPDATE_TITLE";
+export const MESSAGE_INFO_EVENT = "MESSAGE_INFO_EVENT";
 
 export interface DataPageAction {
-  type: typeof UPDATE_TITLE;
-  payload: TDataPageState;
+  type: typeof UPDATE_TITLE | typeof MESSAGE_INFO_EVENT;
+  payload: TDataPageObj;
 }
 
 export const dataPageAction = (
-  type: typeof UPDATE_TITLE,
-  value: TDataPageState
+  type: typeof UPDATE_TITLE | typeof MESSAGE_INFO_EVENT,
+  value: TDataPageObj
 ): DataPageAction => {
   return {
     type: type,

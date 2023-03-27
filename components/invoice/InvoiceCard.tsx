@@ -9,11 +9,12 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { Dispatch, SetStateAction, useState } from "react";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import ButtonBase from "@mui/material/ButtonBase";
 
 import { useDispatch } from "react-redux";
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import ButtonBase from "@mui/material/ButtonBase";
+import { processRequestToObj } from "@/pages/index";
 
 interface Props {
   invoice: TInvoice;
@@ -33,8 +34,22 @@ const styles = {
     cursor: "pointer",
     textAlign: "center",
   },
+  card: {
+    maxWidth: 345,
+    margin: "auto",
+    marginBottom: 20,
+    position: "relative",
+    overflow: "visible",
+    boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+    borderRadius: "10px",
+  },
   content: {
     paddingY: "16px !important",
+  },
+  checkbox: {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
   },
   actions: {
     justifyContent: "flex-end",
@@ -99,9 +114,16 @@ export default function InvoiceCard({
         },
         body: JSON.stringify({ number_id: +editedName }),
       })
-        .then((response) => response.json())
+        .then((response) =>
+          processRequestToObj(
+            "error",
+            "Hubo un error actualizando la factura, por favor intentelo nuevamente",
+            dispatch,
+            response
+          )
+        )
         .then((data) => {
-          console.log(data);
+          if (!data) setEditedName(invoice.number_id.toString());
           setIsEditable(false);
         });
     }
@@ -111,35 +133,46 @@ export default function InvoiceCard({
   return (
     <Grid item xs={12} sm={6} md={4} sx={{ mb: 2 }}>
       <Card
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}
+        style={styles.card}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <CardHeader
           title={
-            isEditable ? (
-              <TextField
-                variant="standard"
-                fullWidth
-                value={editedName}
-                autoFocus={true}
-                onChange={handleNameChange}
-                onBlur={handleNameBlur}
-              />
-            ) : (
-              <Typography
-                variant="h5"
-                component="h2"
-                onClick={handleNameClick}
-                style={styles.title}
-              >
-                #{editedName}
-              </Typography>
-            )
+            <Grid container>
+              <Grid item xs={12}>
+                {" "}
+                {deleteOp && (
+                  <Checkbox
+                    style={styles.checkbox}
+                    checked={checkedList.get(invoice.id) ?? false}
+                    inputProps={{
+                      "aria-label": "Checkbox A",
+                    }}
+                    onChange={(e) => handleChange(invoice.id, e)}
+                  />
+                )}
+                {isEditable ? (
+                  <TextField
+                    variant="standard"
+                    fullWidth
+                    value={editedName}
+                    autoFocus={true}
+                    onChange={handleNameChange}
+                    onBlur={handleNameBlur}
+                  />
+                ) : (
+                  <Typography
+                    variant="h5"
+                    component="h2"
+                    onClick={handleNameClick}
+                    style={styles.title}
+                  >
+                    #{editedName}
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
           }
           titleTypographyProps={{ align: "center", variant: "h5" }}
           subheaderTypographyProps={{ align: "center" }}
@@ -152,29 +185,31 @@ export default function InvoiceCard({
           }}
         />
         <CardContent sx={{ flexGrow: 1 }} style={styles.content}>
-          {deleteOp && (
-            <Checkbox
-              checked={checkedList.get(invoice.id) ?? false}
-              inputProps={{
-                "aria-label": "Checkbox A",
-              }}
-              onChange={(e) => handleChange(invoice.id, e)}
-            />
+          {invoice.files != undefined && invoice.files.length > 0 && (
+            <Link target="_blank" href={invoice.files[0].s3_pdf_url}>
+              <Grid
+                container
+                sx={{
+                  textAlign: "center",
+                  "&:hover": {
+                    color: "#115293",
+                    "& .MuiTypography-root": {
+                      fontWeight: 800,
+                    },
+                  },
+                }}
+              >
+                <Grid item xs={12}>
+                  <ButtonBase>
+                    <PictureAsPdfIcon />
+                  </ButtonBase>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1">Descargar</Typography>
+                </Grid>
+              </Grid>
+            </Link>
           )}
-            {invoice.files != undefined && invoice.files.length > 0 && (
-                  <Link target="_blank" href={invoice.files[0].s3_pdf_url}>
-                    <Grid container sx={{ textAlign: "center" }}>
-                      <Grid item xs={12}>
-                        <ButtonBase >
-                          <PictureAsPdfIcon/>
-                        </ButtonBase>
-                      </Grid>
-                      <Grid item xs={12} >
-                        <Typography variant="subtitle1">Descargar</Typography>
-                      </Grid>
-                    </Grid>
-                  </Link>
-            )}
         </CardContent>
         <CardActions style={styles.actions}>
           <Button size="small">

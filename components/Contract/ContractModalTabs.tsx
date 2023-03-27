@@ -105,9 +105,6 @@ export default function ContractModalTabs(props: ModalProps) {
           </Grid>
         </Grid>
       </TabPanel>
-      <TabPanel value={value} index={1}>
-        Item Two
-      </TabPanel>
     </Box>
   );
 }

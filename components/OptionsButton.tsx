@@ -51,13 +51,17 @@ export default function OptionsButton({
         </Fab>
       )}
       {check_or_cancel && (
-        <Grid spacing={2}>
-          <Fab color="primary" aria-label="add" onClick={function_1}>
-            <CheckIcon />
-          </Fab>
-          <Fab color="primary" aria-label="add" onClick={function_2}>
-            <CloseIcon />
-          </Fab>
+        <Grid container>
+          <Grid item>
+            <Fab color="primary" aria-label="add" onClick={function_1}>
+              <CheckIcon />
+            </Fab>
+          </Grid>
+          <Grid item>
+            <Fab color="primary" aria-label="add" onClick={function_2}>
+              <CloseIcon />
+            </Fab>
+          </Grid>
         </Grid>
       )}
       <Drawer

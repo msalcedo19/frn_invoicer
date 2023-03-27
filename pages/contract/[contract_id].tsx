@@ -3,12 +3,7 @@ import Container from "@mui/material/Container";
 import InvoiceCard from "@/components/Invoice/InvoiceCard";
 
 import Button from "@mui/material/Button";
-import {
-  useEffect,
-  Fragment,
-  useState,
-  ChangeEvent,
-} from "react";
+import { useEffect, Fragment, useState, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import TextField from "@mui/material/TextField";
 
@@ -30,6 +25,12 @@ import {
   INVOICE,
 } from "@/src/actions/breadcrumb";
 import { useDispatch } from "react-redux";
+import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
+import {
+  processRequest,
+  processRequestNonReponse,
+  handleBreadCrumb,
+} from "@/pages/index";
 
 const sortByNameAsc = (a, b) => a.number_id.toString().localeCompare(b.name);
 const sortByNameDesc = (a, b) => b.number_id.toString().localeCompare(a.name);
@@ -83,7 +84,20 @@ export default function CustomerDetail() {
         );
       }
     );
-    Promise.all(urls).then((value) => {
+
+    Promise.all(urls).then((responses) => {
+      for (let response of responses) {
+        if (
+          processRequestNonReponse(
+            "warning",
+            "Una o varias de las facturas no pudo ser eliminada",
+            dispatch,
+            response
+          )
+        )
+          break;
+      }
+
       reload();
       setCheckedList(new Map());
       setDeleteOp(false);
@@ -93,7 +107,14 @@ export default function CustomerDetail() {
   function reload() {
     window
       .fetch(`/api/contract/${contract_id}`)
-      .then((response) => response.json())
+      .then((response) =>
+        processRequest(
+          "error",
+          "Hubo un error, por favor intentelo nuevamente",
+          dispatch,
+          response
+        )
+      )
       .then((data) => {
         if (data && data["invoices"]) {
           setInvoices(data["invoices"]);
@@ -103,6 +124,7 @@ export default function CustomerDetail() {
   }
 
   const dispatch = useDispatch();
+  const router = useRouter();
   useEffect(() => {
     dispatch(
       breadcrumbAction(
@@ -115,7 +137,14 @@ export default function CustomerDetail() {
         INVOICE
       )
     );
-    reload()
+    dispatch(
+      dataPageAction(UPDATE_TITLE, {
+        title: "Facturas",
+      })
+    );
+    reload();
+
+    if (contract_id) handleBreadCrumb(router, dispatch);
   }, [contract_id]);
 
   return (
@@ -128,40 +157,39 @@ export default function CustomerDetail() {
         handleClose={handleClose}
         reload={reload}
       />
-      <Container sx={{ marginTop: "5%" }}>
-        <Grid container spacing={2}>
-          <Grid item>
-            <TextField
-              size="small"
-              label="Search by name"
-              value={searchTerm}
-              onChange={handleSearch}
+      <Grid container spacing={2}>
+        <Grid item>
+          <TextField
+            size="small"
+            label="Search by name"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+        </Grid>
+        <Grid item>
+          <Button onClick={handleSort} variant="outlined">
+            Sort by name ({sortOrder === "asc" ? "ascending" : "descending"})
+          </Button>
+        </Grid>
+      </Grid>
+      <Box sx={{ marginY: 2 }} />
+      <Grid container spacing={5} alignItems="flex-end">
+        {sortedList != undefined &&
+          sortedList.length > 0 &&
+          sortedList.map((invoice: TInvoice) => (
+            <InvoiceCard
+              key={invoice.id}
+              invoice={invoice}
+              checkedList={checkedList}
+              setCheckedList={setCheckedList}
+              deleteOp={deleteOp}
             />
-          </Grid>
-          <Grid item>
-            <Button onClick={handleSort} variant="outlined">
-              Sort by name ({sortOrder === "asc" ? "ascending" : "descending"})
-            </Button>
-          </Grid>
-        </Grid>
-        <Grid container spacing={5} alignItems="flex-end">
-          {sortedList != undefined &&
-            sortedList.length > 0 &&
-            sortedList.map((invoice: TInvoice) => (
-              <InvoiceCard
-                key={invoice.id}
-                invoice={invoice}
-                checkedList={checkedList}
-                setCheckedList={setCheckedList}
-                deleteOp={deleteOp}
-              />
-            ))}
-        </Grid>
-        <Container sx={{ mt: "100px", width: "100%", textAlign: "center" }}>
-          {sortedList && sortedList.length == 0 && (
-            <Typography>Aún no has generado ninguna factura</Typography>
-          )}
-        </Container>
+          ))}
+      </Grid>
+      <Container sx={{ mt: "100px", width: "100%", textAlign: "center" }}>
+        {sortedList && sortedList.length == 0 && (
+          <Typography>Aún no has generado ninguna factura</Typography>
+        )}
       </Container>
 
       <Box sx={{ position: "fixed", bottom: "32px", right: "32px" }}>

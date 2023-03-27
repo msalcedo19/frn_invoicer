@@ -6,6 +6,9 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
+import { useDispatch } from "react-redux";
+import { processRequestToObj } from "@/pages/index";
+
 interface ModalProps {
   reload: () => void;
   open: boolean;
@@ -16,6 +19,15 @@ export default function PostModal(props: ModalProps) {
   const { open, handleClose } = props;
   const [name, setName] = useState("");
 
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  };
+  const handleCreateClick = () => {
+    postObj();
+    handleClose();
+  };
+
+  const dispatch = useDispatch();
   function postObj() {
     if (name) {
       let newCustomer = {
@@ -29,24 +41,23 @@ export default function PostModal(props: ModalProps) {
           },
           body: JSON.stringify(newCustomer),
         })
-        .then((response) => response.json())
+        .then((response) =>
+          processRequestToObj(
+            "error",
+            "Hubo un error creando el cliente, por favor intentelo nuevamente",
+            dispatch,
+            response
+          )
+        )
         .then((data) => {
-          props.reload();
-          handleClose();
-          setName("");
+          if (data) {
+            props.reload();
+            handleClose();
+            setName("");
+          }
         });
     }
   }
-
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
-
-  const handleCreateClick = () => {
-    //handleCreate(name, hourlyCost, to, address, phone);
-    postObj();
-    handleClose();
-  };
 
   return (
     <Modal open={open} onClose={handleClose}>

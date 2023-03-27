@@ -9,6 +9,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 
 import { useDispatch } from "react-redux";
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
+import { processRequestToObj } from "@/pages/index";
 
 const styles = {
   card: {
@@ -68,7 +69,6 @@ export default function ContractCard({
   const handleNameChange = (e) => {
     setEditedName(e.target.value);
   };
-
   const handleNameClick = () => {
     setIsEditable(true);
   };
@@ -82,9 +82,16 @@ export default function ContractCard({
         },
         body: JSON.stringify({ name: editedName }),
       })
-        .then((response) => response.json())
+        .then((response) =>
+          processRequestToObj(
+            "error",
+            "Hubo un error actualizando el contrato, por favor intentelo nuevamente",
+            dispatch,
+            response
+          )
+        )
         .then((data) => {
-          console.log(data);
+          if (!data) setEditedName(contract.name);
           setIsEditable(false);
         });
     }
@@ -151,7 +158,7 @@ export default function ContractCard({
             ${contract.price_unit}/hour
           </Typography>
           <Typography variant="body2" component="p">
-            {"5"} invoices
+            {contract.num_invoices} facturas
           </Typography>
         </CardContent>
         <CardActions style={styles.actions}>

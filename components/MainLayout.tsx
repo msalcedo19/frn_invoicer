@@ -7,6 +7,7 @@ import BasicBreadcrumbs from "@/components/MBreadCrumbs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/src/reducers/rootReducer";
 import { useRouter } from "next/router";
+import BasicAlerts from "./MAlert";
 
 const MainLayout: React.FC<Props> = ({ children }) => {
   const router = useRouter();
@@ -15,6 +16,12 @@ const MainLayout: React.FC<Props> = ({ children }) => {
   return (
     <div>
       <Navbar />
+      {dataPageState.messageInfo.show && (
+        <BasicAlerts
+          severity={dataPageState.messageInfo.severity}
+          message={dataPageState.messageInfo.message}
+        />
+      )}
       <Container maxWidth="lg" component="main" sx={{ marginTop: "2.5%" }}>
         {currentRoute != "/variable" && <BasicBreadcrumbs />}
         <Box sx={{ my: 1 }} />

@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import PostContract from "@/components/Contract/ContractModal";
-import { useEffect, Fragment, useState, Dispatch, SetStateAction } from "react";
+import { useEffect, Fragment, useState } from "react";
 
 import OptionsButton from "@/components/OptionsButton";
 import List from "@mui/material/List";
@@ -14,6 +14,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import Box from "@mui/material/Box";
+
 import { Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
@@ -25,6 +26,13 @@ import {
   CONTRACT,
 } from "@/src/actions/breadcrumb";
 import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
+import {
+  sortByNameDesc,
+  sortByNameAsc,
+  processRequest,
+  processRequestNonReponse,
+  handleBreadCrumb,
+} from "@/pages/index";
 
 const styles = {
   container: {
@@ -44,9 +52,6 @@ const styles = {
     },
   },
 };
-
-const sortByNameAsc = (a, b) => a.name.localeCompare(b.name);
-const sortByNameDesc = (a, b) => b.name.localeCompare(a.name);
 
 export default function CustomerDetail() {
   const [objList, setObjList] = useState<TContract[]>([]);
@@ -85,26 +90,46 @@ export default function CustomerDetail() {
   );
   const [deleteOp, setDeleteOp] = useState<boolean>(false);
   function delete_obj() {
+    let urls: Array<Promise<Response>> = [];
     checkedList.forEach(
       (value: boolean, key: number, map: Map<number, boolean>) => {
-        window
-          .fetch(`/api/contract/${key}`, {
+        urls.push(
+          window.fetch(`/api/contract/${key}`, {
             method: "DELETE",
           })
-          .then((response) => {
-            reload(customer_id);
-            setDeleteOp(false);
-            setCheckedList(new Map());
-          });
+        );
       }
     );
+    Promise.all(urls).then((responses) => {
+      for (let response of responses) {
+        if (
+          processRequestNonReponse(
+            "warning",
+            "Uno o varios de los contratos no pudo ser eliminado",
+            dispatch,
+            response
+          )
+        )
+          break;
+      }
+      reload(customer_id);
+      setDeleteOp(false);
+      setCheckedList(new Map());
+    });
   }
 
   function reload(p_model_id: string | string[] | undefined) {
     if (p_model_id) {
       window
         .fetch(`/api/customer/${p_model_id}`)
-        .then((response) => response.json())
+        .then((response) =>
+          processRequest(
+            "error",
+            "Hubo un error, por favor intentelo nuevamente",
+            dispatch,
+            response
+          )
+        )
         .then((data) => {
           if (data && data["contracts"]) {
             setObjList(data["contracts"]);
@@ -115,6 +140,7 @@ export default function CustomerDetail() {
   }
 
   const dispatch = useDispatch();
+  const router = useRouter();
   useEffect(() => {
     dispatch(
       breadcrumbAction(
@@ -133,6 +159,8 @@ export default function CustomerDetail() {
       })
     );
     reload(customer_id);
+
+    if (customer_id) handleBreadCrumb(router, dispatch);
   }, [customer_id]);
 
   return (
@@ -158,7 +186,7 @@ export default function CustomerDetail() {
           </Button>
         </Grid>
       </Grid>
-
+      <Box sx={{ marginY: 2 }} />
       <Grid container spacing={5} alignItems="flex-end">
         {sortedList.map((obj) => (
           <ContractCard

@@ -22,8 +22,17 @@ import {
   BACK_EVENT,
   CUSTOMER,
 } from "@/src/actions/breadcrumb";
-import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
+import {
+  dataPageAction,
+  UPDATE_TITLE
+} from "@/src/actions/dataPage";
 import { useDispatch } from "react-redux";
+import {
+  sortByNameDesc,
+  sortByNameAsc,
+  processRequest,
+  processRequestNonReponse,
+} from "@/pages/index";
 
 const styles = {
   container: {
@@ -43,9 +52,6 @@ const styles = {
     },
   },
 };
-
-const sortByNameAsc = (a, b) => a.name.localeCompare(b.name);
-const sortByNameDesc = (a, b) => b.name.localeCompare(a.name);
 
 export default function Customer() {
   const [objList, setObjList] = useState<TCustomer[]>([]);
@@ -81,26 +87,45 @@ export default function Customer() {
   );
   const [deleteOp, setDeleteOp] = useState<boolean>(false);
   function delete_obj() {
+    let urls: Array<Promise<Response>> = [];
     checkedList.forEach(
       (value: boolean, key: number, map: Map<number, boolean>) => {
-        window
-          .fetch(`/api/customer/${key}`, {
+        urls.push(
+          window.fetch(`/api/customer/${key}`, {
             method: "DELETE",
           })
-          .then((response) => {
-            console.log(response);
-            reload();
-            setDeleteOp(false);
-            setCheckedList(new Map());
-          });
+        );
       }
     );
+    Promise.all(urls).then((responses) => {
+      for (let response of responses) {
+        if (
+          processRequestNonReponse(
+            "warning",
+            "Uno o varios de los clientes no pudo ser eliminado",
+            dispatch,
+            response
+          )
+        )
+          break;
+      }
+      reload();
+      setDeleteOp(false);
+      setCheckedList(new Map());
+    });
   }
 
   function reload() {
     window
       .fetch(`/api/customer/`)
-      .then((response) => response.json())
+      .then((response) =>
+        processRequest(
+          "error",
+          "Hubo un error, por favor intentelo nuevamente",
+          dispatch,
+          response
+        )
+      )
       .then((data) => {
         setObjList(data);
         setSortedList(data);
@@ -146,7 +171,7 @@ export default function Customer() {
           </Button>
         </Grid>
       </Grid>
-      <Box sx={{marginY: 2}}/>
+      <Box sx={{ marginY: 2 }} />
       <Grid container spacing={5} alignItems="flex-end">
         {sortedList.map((obj) => (
           <CustomerCard

@@ -14,6 +14,17 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import PostInvoiceModal from "@/components/Invoice/InvoiceModal";
 import Box from "@mui/material/Box";
 
+import { useDispatch } from "react-redux";
+import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
+import {
+  processRequest,
+  processRequestNonReponse,
+  handleBreadCrumb,
+} from "@/pages/index";
+
+const sortByDateAsc = (a: TFile, b: TFile) =>
+  new Date(a.created).getTime() <= new Date(b.created).getTime() ? 1 : -1;
+
 export default function CustomerDetail() {
   const [files, setFiles] = useState<TFile[]>([]);
   const {
@@ -27,18 +38,67 @@ export default function CustomerDetail() {
   const [checkedList, setCheckedList] = useState<Map<number, boolean>>(
     new Map()
   );
-
-  function reload() {
-    window
-      .fetch(`/api/invoice/${model_id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data["files"]) setFiles(data["files"]);
-      });
+  const [deleteOp, setDeleteOp] = useState<boolean>(false);
+  function delete_obj() {
+    let urls: Array<Promise<Response>> = [];
+    checkedList.forEach(
+      (value: boolean, key: number, map: Map<number, boolean>) => {
+        urls.push(
+          window.fetch(`/api/files/${key}`, {
+            method: "DELETE",
+          })
+        );
+      }
+    );
+    Promise.all(urls).then((responses) => {
+      for (let response of responses) {
+        if (
+          processRequestNonReponse(
+            "warning",
+            "Una o varias de las versiones no pudo ser eliminada",
+            dispatch,
+            response
+          )
+        )
+          break;
+      }
+      reload();
+      setDeleteOp(false);
+      setCheckedList(new Map());
+    });
   }
 
+  function reload() {
+    if (model_id)
+      window
+        .fetch(`/api/invoice/${model_id}`)
+        .then((response) =>
+          processRequest(
+            "error",
+            "Hubo un error, por favor intentelo nuevamente",
+            dispatch,
+            response
+          )
+        )
+        .then((data) => {
+          if (data && data["files"]) {
+            setFiles(data["files"].sort(sortByDateAsc));
+          }
+        });
+  }
+
+  const dispatch = useDispatch();
+  const router = useRouter();
   useEffect(() => {
     reload();
+
+    dispatch(
+      dataPageAction(UPDATE_TITLE, {
+        title: "Versiones",
+      })
+    );
+
+    if (model_id) handleBreadCrumb(router, dispatch);
   }, [model_id]);
 
   return (
@@ -55,7 +115,15 @@ export default function CustomerDetail() {
         <Grid container spacing={5} alignItems="flex-end">
           {files != undefined &&
             files.length > 0 &&
-            files.map((file: TFile) => <FilesRow key={file.id} file={file} />)}
+            files.map((file: TFile) => (
+              <FilesRow
+                key={file.id}
+                file={file}
+                checkedList={checkedList}
+                setCheckedList={setCheckedList}
+                deleteOp={deleteOp}
+              />
+            ))}
         </Grid>
         <Container
           sx={{ mt: "100px", width: "100%", textAlign: "center" }}
@@ -63,7 +131,11 @@ export default function CustomerDetail() {
       </Container>
 
       <Box sx={{ position: "fixed", bottom: "32px", right: "32px" }}>
-        <OptionsButton>
+        <OptionsButton
+          function_1={delete_obj}
+          function_2={() => setDeleteOp(false)}
+          check_or_cancel={deleteOp}
+        >
           <List>
             <ListItem key={"upload_file"} disablePadding>
               <ListItemButton onClick={handleOpen}>
@@ -74,7 +146,7 @@ export default function CustomerDetail() {
               </ListItemButton>
             </ListItem>
             <ListItem key={"delete_file"} disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={() => setDeleteOp(true)}>
                 <ListItemIcon>
                   <InboxIcon />
                 </ListItemIcon>

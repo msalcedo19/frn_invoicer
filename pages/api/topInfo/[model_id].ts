@@ -3,13 +3,18 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<[TCustomer]>
+  res: NextApiResponse
 ) {
+  const model_id = req.query.model_id;
   if (req.method === "POST") {
     // Process a POST request
+  } else if (req.method === "GET") {
+    // Handle any other HTTP method
+    res.status(200).json({});
+  } else {
     const postData = async () => {
-      const response = await fetch("http://127.0.0.1:8000/customer/", {
-        method: "POST",
+      const response = await fetch(`http://127.0.0.1:8000/topinfo/${model_id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -18,16 +23,6 @@ export default async function handler(
       return response.json();
     };
     const data = await postData();
-    res.status(200).json(data);
-  } else {
-    // Handle any other HTTP method
-    const getData = async () => {
-      const response = await fetch("http://127.0.0.1:8000/customer/", {
-        method: "GET",
-      });
-      return response.json();
-    };
-    const data = await getData();
     res.status(200).json(data);
   }
 }

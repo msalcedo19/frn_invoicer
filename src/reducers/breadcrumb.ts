@@ -39,7 +39,7 @@ export const reducer = (
   let updatedBreadcrumbs: TBreadcrumbOptionState[] = [];
   switch (action.type) {
     case RELOAD_EVENT:
-      console.log(RELOAD_EVENT);
+      //console.log(RELOAD_EVENT);
       if (Array.isArray(action.payload)) {
         return {
           ...state,
@@ -53,7 +53,7 @@ export const reducer = (
       }
       return state;
     case CHECK_ACTION:
-      console.log(CHECK_ACTION);
+      //console.log(CHECK_ACTION);
       if (!Array.isArray(action.payload)) {
         updatedBreadcrumbs = state.options.map((obj) => {
           if (obj.active) {
@@ -69,7 +69,7 @@ export const reducer = (
       }
       return state;
     case BACK_EVENT:
-      console.log(BACK_EVENT);
+      //console.log(BACK_EVENT);
       if (action.check == CUSTOMER && state.options.length < 2) return state;
       else if (action.check == CONTRACT && state.options.length < 3)
         return state;
@@ -98,7 +98,7 @@ export const reducer = (
         ],
       };
     default:
-      console.log("default");
+      //console.log("default");
       return state;
   }
 };

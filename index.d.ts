@@ -9,6 +9,7 @@ type TContract = {
   name: string;
   price_unit: number;
   invoices: Array[TInvoice]
+  num_invoices; number;
 };
 
 type TInvoice = {
@@ -32,12 +33,20 @@ type TFile = {
   invoice_id: number
 }
 
+type TTopInfo = {
+  id: number
+  ti_from: string
+  addr: string
+  email: string
+  phone: string
+}
+
 type TGlobal = {
   id: number
   name: str
   value: str
-  created: Date
-  updated: Date
+  created: string
+  updated: string
 }
 
 type TBillTo = {

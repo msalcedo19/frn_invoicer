@@ -7,6 +7,9 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import ContractModalTabs from "./ContractModalTabs";
 
+import { useDispatch } from "react-redux";
+import { processRequestToObj } from "@/pages/index";
+
 interface ModalProps {
   reload: (model_id: string | string[] | undefined) => void;
   customer_id: Number | undefined;
@@ -20,9 +23,12 @@ export default function PostContract(props: ModalProps) {
   const [hourlyCost, setHourlyCost] = useState("");
 
   const [to, setTo] = useState("Sparksuite, Inc.");
-  const [address, setAddress] = useState("12345 Sunny Road Sunnyville, CA 12345");
+  const [address, setAddress] = useState(
+    "12345 Sunny Road Sunnyville, CA 12345"
+  );
   const [phone, setPhone] = useState("1234567890");
 
+  const dispatch = useDispatch();
   function postObj() {
     if (name && hourlyCost && props.customer_id) {
       let newConsumer = {
@@ -38,37 +44,46 @@ export default function PostContract(props: ModalProps) {
           },
           body: JSON.stringify(newConsumer),
         })
-        .then((response) => response.json())
+        .then((response) =>
+          processRequestToObj(
+            "error",
+            "Hubo un error creando el contrato, por favor intentelo nuevamente",
+            dispatch,
+            response
+          )
+        )
         .then((data) => {
-          if (to && address && phone) {
-            let newBillTo = {
-              to: to,
-              addr: address,
-              phone: phone,
-              contract_id: data && data.id ? data.id : undefined,
-            };
-            console.log(newBillTo)
-            window
-              .fetch("/api/billTo", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(newBillTo),
-              })
-              .then((response) => response.json())
-              .then((data) => {
-                //setTo("");
-                //setAddress("");
-                //setPhone("");
-              });
+          if (data) {
+            if (to && address && phone) {
+              let newBillTo = {
+                to: to,
+                addr: address,
+                phone: phone,
+                contract_id: data && data.id ? data.id : undefined,
+              };
+              window
+                .fetch("/api/billTo", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(newBillTo),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                  //setTo("");
+                  //setAddress("");
+                  //setPhone("");
+                });
+            }
+
+            props.reload(
+              props.customer_id ? props.customer_id.toString() : undefined
+            );
+            handleClose();
+            setName("");
+            setHourlyCost("");
           }
-          props.reload(
-            props.customer_id ? props.customer_id.toString() : undefined
-          );
-          handleClose();
-          setName("");
-          setHourlyCost("");
         });
     }
   }
@@ -84,7 +99,6 @@ export default function PostContract(props: ModalProps) {
   };
 
   const handleCreateClick = () => {
-    //handleCreate(name, hourlyCost, to, address, phone);
     postObj();
     handleClose();
   };
@@ -128,7 +142,14 @@ export default function PostContract(props: ModalProps) {
         <Box sx={{ my: 2 }}>
           <hr />
         </Box>
-        <ContractModalTabs to={to} setTo={setTo} address={address} setAddress={setAddress} setPhone={setPhone} phone={phone}/>
+        <ContractModalTabs
+          to={to}
+          setTo={setTo}
+          address={address}
+          setAddress={setAddress}
+          setPhone={setPhone}
+          phone={phone}
+        />
         <Box sx={{ my: 2 }}>
           <Button variant="contained" onClick={handleCreateClick}>
             Crear

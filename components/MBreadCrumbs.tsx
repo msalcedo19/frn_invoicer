@@ -31,20 +31,17 @@ export default function BasicBreadcrumbs() {
 
   const handleClick = async () => {
     const currentRoute = router.asPath;
-    let parts = currentRoute.split("/").filter((part) => part != "");
-    if (parts.length != breadcrumbsState.options.length) {
-      fetch("http://127.0.0.1:8000/breadcrumbs/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ current_path: currentRoute }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          dispatch(breadcrumbAction(RELOAD_EVENT, data["options"], undefined));
-        });
-    }
+    fetch("http://127.0.0.1:8000/breadcrumbs/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ current_path: currentRoute }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        dispatch(breadcrumbAction(RELOAD_EVENT, data["options"], undefined));
+      });
   };
 
   return (

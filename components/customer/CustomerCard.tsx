@@ -3,12 +3,15 @@ import CardActions from "@mui/material/CardActions";
 import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
-import Link from "next/link";
 import { Card, CardContent, Typography } from "@mui/material";
-import { Dispatch, SetStateAction, Fragment } from "react";
-import { useState } from "react";
+import Link from "next/link";
+
+import { Dispatch, SetStateAction, Fragment, useState } from "react";
 import { useDispatch } from "react-redux";
+
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
+import { processRequestToObj } from "@/pages/index";
+
 const styles = {
   card: {
     maxWidth: 345,
@@ -21,7 +24,7 @@ const styles = {
   },
   content: {
     paddingBottom: "16px !important",
-    textAlign: "center"
+    textAlign: "center",
   },
   title: {
     fontWeight: "bold",
@@ -109,12 +112,19 @@ export default function CustomerCard({
         },
         body: JSON.stringify({ name: editedName }),
       })
-        .then((response) => response.json())
+        .then((response) =>
+          processRequestToObj(
+            "error",
+            "Hubo un error actualizando el cliente, por favor intentelo nuevamente",
+            dispatch,
+            response
+          )
+        )
         .then((data) => {
-          console.log(data);
+          if (!data) setEditedName(customer.name);
           setIsEditable(false);
         });
-    } 
+    }
     setIsEditable(false);
   };
 
