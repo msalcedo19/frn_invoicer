@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import { API_ENDPOINT } from "config";
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,7 +10,7 @@ export default async function handler(
   if (req.method === "DELETE") {
     const getData = async () => {
       const response = await fetch(
-        `http://127.0.0.1:8000/contract/${model_id}`,
+        `${API_ENDPOINT}/contract/${model_id}`,
         {
           method: "DELETE",
         }
@@ -22,7 +23,7 @@ export default async function handler(
     // Handle any other HTTP method
     const getData = async () => {
       const response = await fetch(
-        `http://127.0.0.1:8000/contract/${model_id}`,
+        `${API_ENDPOINT}/contract/${model_id}`,
         {
           method: "GET",
         }
@@ -34,7 +35,7 @@ export default async function handler(
   } else {
     const postData = async () => {
       const response = await fetch(
-        `http://127.0.0.1:8000/contract/${model_id}`,
+        `${API_ENDPOINT}/contract/${model_id}`,
         {
           method: "PATCH",
           headers: {

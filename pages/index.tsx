@@ -6,6 +6,7 @@ import { NextRouter } from "next/router";
 import { Dispatch } from "react";
 import { dataPageAction, MESSAGE_INFO_EVENT } from "@/src/actions/dataPage";
 import { breadcrumbAction, RELOAD_EVENT } from "@/src/actions/breadcrumb";
+import { API_ENDPOINT } from "config";
 
 export const sortByNameAsc = (a, b) => a.name.localeCompare(b.name);
 export const sortByNameDesc = (a, b) => b.name.localeCompare(a.name);
@@ -15,7 +16,7 @@ export const handleBreadCrumb = async (
   dispatch: Dispatch<AnyAction>
 ) => {
   const currentRoute = router.asPath;
-  fetch("http://127.0.0.1:8000/breadcrumbs/", {
+  fetch(`${API_ENDPOINT}/breadcrumbs/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

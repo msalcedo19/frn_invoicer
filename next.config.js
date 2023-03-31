@@ -1,14 +1,15 @@
 /** @type {import('next').NextConfig} */
+import { API_ENDPOINT } from "config";
 const nextConfig = {
   reactStrictMode: true,
   async rewrites() {
     return [
       {
-        source: '/api/file_manage',
-        destination: 'http://127.0.0.1:8000/upload_file/'
-      }
-    ]
-  }
-}
+        source: "/api/file_manage",
+        destination: `${API_ENDPOINT}/upload_file/`,
+      },
+    ];
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

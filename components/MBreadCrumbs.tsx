@@ -10,7 +10,8 @@ import { styled } from "@mui/material/styles";
 import { useDispatch } from "react-redux";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { breadcrumbAction, RELOAD_EVENT } from "@/src/actions/breadcrumb";
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
+import { API_ENDPOINT } from "config";
 
 function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
   console.info("You clicked a breadcrumb.");
@@ -31,7 +32,7 @@ export default function BasicBreadcrumbs() {
 
   const handleClick = async () => {
     const currentRoute = router.asPath;
-    fetch("http://127.0.0.1:8000/breadcrumbs/", {
+    fetch(`${API_ENDPOINT}/breadcrumbs/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

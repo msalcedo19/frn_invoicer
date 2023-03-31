@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import { API_ENDPOINT } from "config";
 
 export default async function handler(
   req: NextApiRequest,
@@ -8,7 +9,7 @@ export default async function handler(
   if (req.method === "POST") {
     // Process a POST request
     const postData = async () => {
-      const response = await fetch("http://127.0.0.1:8000/customer/", {
+      const response = await fetch(`${API_ENDPOINT}/customer/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,7 +23,7 @@ export default async function handler(
   } else {
     // Handle any other HTTP method
     const getData = async () => {
-      const response = await fetch("http://127.0.0.1:8000/customer/", {
+      const response = await fetch(`${API_ENDPOINT}/customer/`, {
         method: "GET",
       });
       return response.json();

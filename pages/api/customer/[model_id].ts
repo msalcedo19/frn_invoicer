@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import { API_ENDPOINT } from "config";
 
 export default async function handler(
   req: NextApiRequest,
@@ -8,32 +9,26 @@ export default async function handler(
   const model_id = req.query.model_id;
   if (req.method === "DELETE") {
     const getData = async () => {
-      const response = await fetch(
-        `http://127.0.0.1:8000/customer/${model_id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${API_ENDPOINT}/customer/${model_id}`, {
+        method: "DELETE",
+      });
       return response.json();
     };
-    const data = await getData()
+    const data = await getData();
     res.status(200).json(data);
-  } else if(req.method == "GET"){
+  } else if (req.method == "GET") {
     // Handle any other HTTP method
     const getData = async () => {
-      const response = await fetch(
-        `http://127.0.0.1:8000/customer/${model_id}`,
-        {
-          method: "GET",
-        }
-      );
+      const response = await fetch(`${API_ENDPOINT}/customer/${model_id}`, {
+        method: "GET",
+      });
       return response.json();
     };
-    const data = await getData()
+    const data = await getData();
     res.status(200).json(data);
   } else {
     const postData = async () => {
-      const response = await fetch(`http://127.0.0.1:8000/customer/${model_id}`, {
+      const response = await fetch(`${API_ENDPOINT}/customer/${model_id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

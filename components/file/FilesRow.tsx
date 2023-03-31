@@ -48,7 +48,7 @@ export default function FilesRow(props: FilesRowProps) {
 
   return (
     <Fragment>
-      <Container maxWidth="md" sx={{ marginY: "25px" }}>
+      <Container maxWidth="lg" sx={{ marginY: "25px" }}>
         <Grid container spacing={2} sx={{ textAlign: "-webkit-center" }}>
           <Grid item xs={5} sx={{ padding: "0px !important" }}>
             <Link target="_blank" href={props.file.s3_pdf_url}>
