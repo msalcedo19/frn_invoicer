@@ -11,6 +11,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
+import CreateIcon from "@mui/icons-material/Create";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { PostInvoiceModal } from "@/components/Invoice/InvoiceModal";
 import Box from "@mui/material/Box";
 
@@ -20,6 +22,7 @@ import {
   processRequest,
   processRequestNonReponse,
   handleBreadCrumb,
+  sendMessageAction,
 } from "@/pages/index";
 
 const sortByDateAsc = (a: TFile, b: TFile) =>
@@ -51,6 +54,7 @@ export default function CustomerDetail() {
       }
     );
     Promise.all(urls).then((responses) => {
+      let failed = false;
       for (let response of responses) {
         if (
           processRequestNonReponse(
@@ -59,9 +63,15 @@ export default function CustomerDetail() {
             dispatch,
             response
           )
-        )
+        ) {
+          failed = true;
           break;
+        }
       }
+
+      if (!failed)
+        sendMessageAction("success", "Se eliminaron correctamente", dispatch);
+
       reload();
       setDeleteOp(false);
       setCheckedList(new Map());
@@ -140,7 +150,7 @@ export default function CustomerDetail() {
             <ListItem key={"upload_file"} disablePadding>
               <ListItemButton onClick={handleOpen}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <CreateIcon />
                 </ListItemIcon>
                 <ListItemText primary={"Generar nueva factura"} />
               </ListItemButton>
@@ -148,7 +158,7 @@ export default function CustomerDetail() {
             <ListItem key={"delete_file"} disablePadding>
               <ListItemButton onClick={() => setDeleteOp(true)}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <DeleteIcon />
                 </ListItemIcon>
                 <ListItemText primary={"Eliminar factura/excel"} />
               </ListItemButton>

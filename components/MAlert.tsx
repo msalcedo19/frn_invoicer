@@ -34,14 +34,15 @@ export default function BasicAlerts(props: AlertProps) {
       sx={{
         position: "fixed",
         zIndex: 9999,
-        paddingTop: "2.5%",
+        paddingBottom: "2.5%",
         left: 0,
         right: 0,
+        bottom: 0,
         margin: "auto",
         width: "50%",
       }}
     >
-      <Slide direction="down" in={true} mountOnEnter unmountOnExit>
+      <Slide direction="up" in={true} mountOnEnter unmountOnExit>
         <Alert severity={props.severity}>{props.message}</Alert>
       </Slide>
     </Box>

@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Grid, Modal, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
+
 import InvoiceModalBillTo from "@/components/Invoice/InvoiceModalBillTo";
+import { processRequestToObj, sendMessageAction } from "@/pages/index";
+import { useDispatch } from "react-redux";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
@@ -51,17 +54,13 @@ export const PostInvoiceModal = ({
 
   useEffect(() => {
     window
-      .fetch(`/api/global/tax_1`)
+      .fetch(`/api/global`)
       .then((response) => response.json())
       .then((data) => {
-        setTax1(data);
-      });
-
-    window
-      .fetch(`/api/global/tax_2`)
-      .then((response) => response.json())
-      .then((data) => {
-        setTax2(data);
+        if(data){
+          setTax1(data[0]);
+          setTax2(data[1]);
+        }
       });
 
     window
@@ -73,6 +72,7 @@ export const PostInvoiceModal = ({
       });
   }, [model_id]);
 
+  const dispatch = useDispatch();
   function postFile() {
     if (create_new_invoice && contract_id && invoice_id && billTo) {
       let newInvoice = {
@@ -96,6 +96,11 @@ export const PostInvoiceModal = ({
         })
         .then((response) => {
           if (response.status < 200 || response.status >= 400) {
+            sendMessageAction(
+              "error",
+              "Hubo un error creando la factura, por favor intentelo nuevamente",
+              dispatch
+            );
             return undefined;
           }
           return response.json();
@@ -120,9 +125,20 @@ export const PostInvoiceModal = ({
               .then((data) => {
                 reload();
                 handleClose();
+                setInvoiceId("");
+                sendMessageAction(
+                  "success",
+                  "Se creó la factura correctamente",
+                  dispatch
+                );
               });
           } else if (!file) {
             setError(true);
+            sendMessageAction(
+              "error",
+              "Hubo un error creando la factura, por favor intentelo nuevamente",
+              dispatch
+            );
           }
         });
     } else if (file && model_id) {
@@ -134,15 +150,23 @@ export const PostInvoiceModal = ({
           method: "POST",
           body: info_data,
         })
-        .then((response) => {
-          if (response.status < 200 || response.status >= 400) {
-            return undefined;
-          }
-          return response.json();
-        })
+        .then((response) =>
+          processRequestToObj(
+            "error",
+            "Hubo un error creando la factura, por favor intentelo nuevamente",
+            dispatch,
+            response
+          )
+        )
         .then((data) => {
           reload();
           handleClose();
+          setInvoiceId("");
+          sendMessageAction(
+            "success",
+            "Se creó la factura correctamente",
+            dispatch
+          );
         });
     }
   }

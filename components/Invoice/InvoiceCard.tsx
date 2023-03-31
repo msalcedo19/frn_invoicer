@@ -8,13 +8,19 @@ import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { Dispatch, SetStateAction, useState, ChangeEvent, CSSProperties } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useState,
+  ChangeEvent,
+  CSSProperties,
+} from "react";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ButtonBase from "@mui/material/ButtonBase";
 
 import { useDispatch } from "react-redux";
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
-import { processRequestToObj } from "@/pages/index";
+import { processRequestToObj, sendMessageAction } from "@/pages/index";
 
 interface Props {
   invoice: TInvoice;
@@ -99,7 +105,9 @@ export function InvoiceCard({
 
   const [isEditable, setIsEditable] = useState(false);
   const [editedName, setEditedName] = useState(invoice.number_id.toString());
-  const handleNameChange = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleNameChange = (
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
     setEditedName(e.target.value);
   };
   const handleNameClick = () => {
@@ -124,6 +132,12 @@ export function InvoiceCard({
         )
         .then((data) => {
           if (!data) setEditedName(invoice.number_id.toString());
+          else
+            sendMessageAction(
+              "success",
+              "Se actualizó correctamente",
+              dispatch
+            );
           setIsEditable(false);
         });
     }
@@ -185,31 +199,33 @@ export function InvoiceCard({
           }}
         />
         <CardContent sx={{ flexGrow: 1 }} style={styles.content}>
-          {invoice.files != undefined && invoice.files.length > 0 && invoice.files[0].s3_pdf_url && (
-            <Link target="_blank" href={invoice.files[0].s3_pdf_url}>
-              <Grid
-                container
-                sx={{
-                  textAlign: "center",
-                  "&:hover": {
-                    color: "#115293",
-                    "& .MuiTypography-root": {
-                      fontWeight: 800,
+          {invoice.files != undefined &&
+            invoice.files.length > 0 &&
+            invoice.files[0].s3_pdf_url && (
+              <Link target="_blank" href={invoice.files[0].s3_pdf_url}>
+                <Grid
+                  container
+                  sx={{
+                    textAlign: "center",
+                    "&:hover": {
+                      color: "#115293",
+                      "& .MuiTypography-root": {
+                        fontWeight: 800,
+                      },
                     },
-                  },
-                }}
-              >
-                <Grid item xs={12}>
-                  <ButtonBase>
-                    <PictureAsPdfIcon />
-                  </ButtonBase>
+                  }}
+                >
+                  <Grid item xs={12}>
+                    <ButtonBase>
+                      <PictureAsPdfIcon />
+                    </ButtonBase>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle1">Descargar</Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="subtitle1">Descargar</Typography>
-                </Grid>
-              </Grid>
-            </Link>
-          )}
+              </Link>
+            )}
         </CardContent>
         <CardActions style={styles.actions}>
           <Button size="small">

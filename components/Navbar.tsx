@@ -47,6 +47,9 @@ export default function Navbar() {
             <Link href="/customer">Clientes</Link>
           </Button>
           <Button style={styles.navLink}>
+            <Link href="/contract">Contratos</Link>
+          </Button>
+          <Button style={styles.navLink}>
             <Link href="/variable">Variables</Link>
           </Button>
           <Button style={styles.navLink}>

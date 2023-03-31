@@ -53,7 +53,7 @@ export default function OptionsButton({
       {check_or_cancel && (
         <Grid container>
           <Grid item>
-            <Fab color="primary" aria-label="add" onClick={function_1}>
+            <Fab sx={{backgroundColor: "green"}} aria-label="add" onClick={function_1}>
               <CheckIcon />
             </Fab>
           </Grid>

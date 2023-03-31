@@ -13,6 +13,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
+import CreateIcon from '@mui/icons-material/Create';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Typography } from "@mui/material";
 import CustomerCard from "@/components/Customer/CustomerCard";
 import Box from "@mui/material/Box";
@@ -22,16 +24,14 @@ import {
   BACK_EVENT,
   CUSTOMER,
 } from "@/src/actions/breadcrumb";
-import {
-  dataPageAction,
-  UPDATE_TITLE
-} from "@/src/actions/dataPage";
+import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
 import { useDispatch } from "react-redux";
 import {
   sortByNameDesc,
   sortByNameAsc,
   processRequest,
   processRequestNonReponse,
+  sendMessageAction,
 } from "@/pages/index";
 
 const styles = {
@@ -61,7 +61,9 @@ export default function Customer() {
   const handleClose = () => setOpen(false);
 
   const [searchTerm, setSearchTerm] = useState("");
-  function handleSearch(event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
+  function handleSearch(
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) {
     const term = event.target.value;
     setSearchTerm(term);
     const filtered = objList.filter((obj) =>
@@ -98,6 +100,7 @@ export default function Customer() {
       }
     );
     Promise.all(urls).then((responses) => {
+      let failed = false;
       for (let response of responses) {
         if (
           processRequestNonReponse(
@@ -106,9 +109,15 @@ export default function Customer() {
             dispatch,
             response
           )
-        )
+        ) {
+          failed = true;
           break;
+        }
       }
+
+      if (!failed)
+        sendMessageAction("success", "Se eliminaron correctamente", dispatch);
+
       reload();
       setDeleteOp(false);
       setCheckedList(new Map());
@@ -160,14 +169,14 @@ export default function Customer() {
         <Grid item>
           <TextField
             size="small"
-            label="Search by name"
+            label="Buscar por nombre"
             value={searchTerm}
             onChange={handleSearch}
           />
         </Grid>
         <Grid item>
           <Button onClick={handleSort} variant="outlined">
-            Sort by name ({sortOrder === "asc" ? "ascending" : "descending"})
+            Ordenar por nombre ({sortOrder === "asc" ? "ascendente" : "descendente"})
           </Button>
         </Grid>
       </Grid>
@@ -185,7 +194,7 @@ export default function Customer() {
       </Grid>
       <Container sx={styles.container}>
         {sortedList.length == 0 && (
-          <Typography>Aún no has creado ningún cliente</Typography>
+          <Typography>{searchTerm.length > 0 ? "Ningún cliente coincide con la busqueda" : "Aún no has creado ningún cliente"}</Typography>
         )}
       </Container>
 
@@ -199,7 +208,7 @@ export default function Customer() {
             <ListItem key={"new_key"} disablePadding>
               <ListItemButton onClick={handleOpen}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <CreateIcon />
                 </ListItemIcon>
                 <ListItemText primary={"Crear nuevo cliente"} />
               </ListItemButton>
@@ -207,7 +216,7 @@ export default function Customer() {
             <ListItem key={"delete_key"} disablePadding>
               <ListItemButton onClick={() => setDeleteOp(true)}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <DeleteIcon />
                 </ListItemIcon>
                 <ListItemText
                   primary={

@@ -6,11 +6,18 @@ import TextField from "@mui/material/TextField";
 import { Card, CardContent, Typography } from "@mui/material";
 import Link from "next/link";
 
-import { Dispatch, SetStateAction, Fragment, useState, ChangeEvent, CSSProperties } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  Fragment,
+  useState,
+  ChangeEvent,
+  CSSProperties,
+} from "react";
 import { useDispatch } from "react-redux";
 
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
-import { processRequestToObj } from "@/pages/index";
+import { processRequestToObj, sendMessageAction } from "@/pages/index";
 
 const styles = {
   card: {
@@ -95,7 +102,9 @@ export default function CustomerCard({
   const [isEditable, setIsEditable] = useState(false);
   const [editedName, setEditedName] = useState(customer.name);
 
-  const handleNameChange = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleNameChange = (
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
     setEditedName(e.target.value);
   };
 
@@ -122,6 +131,12 @@ export default function CustomerCard({
         )
         .then((data) => {
           if (!data) setEditedName(customer.name);
+          else
+            sendMessageAction(
+              "success",
+              "Se actualizó correctamente",
+              dispatch
+            );
           setIsEditable(false);
         });
     }

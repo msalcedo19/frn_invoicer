@@ -61,10 +61,6 @@ export default function BasicBreadcrumbs() {
           )
         )}
       </Breadcrumbs>
-      <Box sx={{ mx: 2 }} />
-      <RefreshButton onClick={handleClick}>
-        <RefreshIcon fontSize="small" />
-      </RefreshButton>
     </Box>
   );
 }

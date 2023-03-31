@@ -15,6 +15,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
+import CreateIcon from '@mui/icons-material/Create';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { PostInvoiceModal } from "@/components/Invoice/InvoiceModal";
 import { InvoiceCard } from "@/components/Invoice/InvoiceCard";
 import Box from "@mui/material/Box";
@@ -30,6 +32,7 @@ import {
   processRequest,
   processRequestNonReponse,
   handleBreadCrumb,
+  sendMessageAction,
 } from "@/pages/index";
 
 const sortByNameAsc = (a: TInvoice, b: TInvoice) =>
@@ -88,6 +91,7 @@ export default function CustomerDetail() {
     );
 
     Promise.all(urls).then((responses) => {
+      let failed = false;
       for (let response of responses) {
         if (
           processRequestNonReponse(
@@ -96,9 +100,14 @@ export default function CustomerDetail() {
             dispatch,
             response
           )
-        )
+        ) {
+          failed = true;
           break;
+        }
       }
+
+      if (!failed)
+        sendMessageAction("success", "Se eliminaron correctamente", dispatch);
 
       reload();
       setCheckedList(new Map());
@@ -163,14 +172,14 @@ export default function CustomerDetail() {
         <Grid item>
           <TextField
             size="small"
-            label="Search by name"
+            label="Buscar por nombre"
             value={searchTerm}
             onChange={handleSearch}
           />
         </Grid>
         <Grid item>
           <Button onClick={handleSort} variant="outlined">
-            Sort by name ({sortOrder === "asc" ? "ascending" : "descending"})
+            Ordenar por nombre ({sortOrder === "asc" ? "ascendente" : "descendente"})
           </Button>
         </Grid>
       </Grid>
@@ -190,7 +199,7 @@ export default function CustomerDetail() {
       </Grid>
       <Container sx={{ mt: "100px", width: "100%", textAlign: "center" }}>
         {sortedList && sortedList.length == 0 && (
-          <Typography>Aún no has generado ninguna factura</Typography>
+          <Typography>{searchTerm.length > 0 ? "Ninguna factura coincide con la busqueda" : "Aún no has generado ninguna factura"}</Typography>
         )}
       </Container>
 
@@ -204,7 +213,7 @@ export default function CustomerDetail() {
             <ListItem key={"upload_file"} disablePadding>
               <ListItemButton onClick={handleOpen}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <CreateIcon />
                 </ListItemIcon>
                 <ListItemText primary={"Crear nueva factura"} />
               </ListItemButton>
@@ -212,7 +221,7 @@ export default function CustomerDetail() {
             <ListItem key={"delete_invoice"} disablePadding>
               <ListItemButton onClick={() => setDeleteOp(true)}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <DeleteIcon />
                 </ListItemIcon>
                 <ListItemText primary={"Eliminar facturas"} />
               </ListItemButton>

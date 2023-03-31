@@ -13,6 +13,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
+import CreateIcon from '@mui/icons-material/Create';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Box from "@mui/material/Box";
 
 import { Typography } from "@mui/material";
@@ -32,6 +34,7 @@ import {
   processRequest,
   processRequestNonReponse,
   handleBreadCrumb,
+  sendMessageAction,
 } from "@/pages/index";
 
 const styles = {
@@ -61,7 +64,9 @@ export default function CustomerDetail() {
   } = useRouter();
 
   const [searchTerm, setSearchTerm] = useState("");
-  function handleSearch(event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
+  function handleSearch(
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) {
     const term = event.target.value;
     setSearchTerm(term);
     const filtered = objList.filter((obj) =>
@@ -98,6 +103,7 @@ export default function CustomerDetail() {
       }
     );
     Promise.all(urls).then((responses) => {
+      let failed = false;
       for (let response of responses) {
         if (
           processRequestNonReponse(
@@ -106,9 +112,15 @@ export default function CustomerDetail() {
             dispatch,
             response
           )
-        )
+        ) {
+          failed = true;
           break;
+        }
       }
+
+      if (!failed)
+        sendMessageAction("success", "Se eliminaron correctamente", dispatch);
+
       reload(customer_id);
       setDeleteOp(false);
       setCheckedList(new Map());
@@ -172,14 +184,14 @@ export default function CustomerDetail() {
         <Grid item>
           <TextField
             size="small"
-            label="Search by name"
+            label="Buscar por nombre"
             value={searchTerm}
             onChange={handleSearch}
           />
         </Grid>
         <Grid item>
           <Button onClick={handleSort} variant="outlined">
-            Sort by name ({sortOrder === "asc" ? "ascending" : "descending"})
+            Ordenar por nombre ({sortOrder === "asc" ? "ascendente" : "descendente"})
           </Button>
         </Grid>
       </Grid>
@@ -197,7 +209,7 @@ export default function CustomerDetail() {
       </Grid>
       <Container sx={styles.container}>
         {sortedList.length == 0 && (
-          <Typography>Aún no has creado ningún contrato</Typography>
+          <Typography>{searchTerm.length > 0 ? "Ningún contrato coincide con la busqueda" : "Aún no has creado ningún contrato"}</Typography>
         )}
       </Container>
 
@@ -211,7 +223,7 @@ export default function CustomerDetail() {
             <ListItem key={"new_key"} disablePadding>
               <ListItemButton onClick={handleOpen}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <CreateIcon />
                 </ListItemIcon>
                 <ListItemText primary={"Crear nueva contrato"} />
               </ListItemButton>
@@ -219,7 +231,7 @@ export default function CustomerDetail() {
             <ListItem key={"delete_key"} disablePadding>
               <ListItemButton onClick={() => setDeleteOp(true)}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <DeleteIcon />
                 </ListItemIcon>
                 <ListItemText
                   primary={

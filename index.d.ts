@@ -54,7 +54,6 @@ type TBillTo = {
   to: string
   addr: string
   phone: string
-  contract_id: number
 };
 
 type Props = {

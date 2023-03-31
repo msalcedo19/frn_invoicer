@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
 import { useDispatch } from "react-redux";
-import { processRequestToObj } from "@/pages/index";
+import { processRequestToObj, sendMessageAction } from "@/pages/index";
 
 interface ModalProps {
   reload: () => void;
@@ -54,6 +54,11 @@ export default function PostModal(props: ModalProps) {
             props.reload();
             handleClose();
             setName("");
+            sendMessageAction(
+              "success",
+              "Se creó el cliente correctamente",
+              dispatch
+            );
           }
         });
     }

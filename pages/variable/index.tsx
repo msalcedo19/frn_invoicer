@@ -12,7 +12,7 @@ import Box from "@mui/material/Box";
 
 import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
 import { useDispatch } from "react-redux";
-import { processRequestToObj } from "@/pages/index";
+import { processRequestToObj, sendMessageAction } from "@/pages/index";
 
 function VariableEditor() {
   const [editedVariables, setEditedVariables] = useState<TGlobal[]>([]);
@@ -30,6 +30,7 @@ function VariableEditor() {
       .toISOString()
       .slice(0, 10)} ${formattedDate.getHours()}:${formattedDate.getMinutes()}`;
   }
+
   const handleVariableChange = (
     index: number,
     field: string,
@@ -68,8 +69,10 @@ function VariableEditor() {
         )
       )
       .then((data) => {
-        if (data) setEditedVariables(data);
-        else if (previousValue != "") {
+        if (data) {
+          setEditedVariables(data);
+          sendMessageAction("success", "Se actualizó correctamente", dispatch);
+        } else if (previousValue != "") {
           const editedVariable = {
             ...editedVariables[index],
             [field]: previousValue,
@@ -122,6 +125,7 @@ function VariableEditor() {
       .then((data) => {
         if (data) {
           setTopinfos(data);
+          sendMessageAction("success", "Se actualizó correctamente", dispatch);
         } else if (previousValueTI != "") {
           const editedTopInfo = {
             ...topinfos[index],
@@ -164,10 +168,9 @@ function VariableEditor() {
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Value</TableCell>
-              <TableCell>Created</TableCell>
-              <TableCell>Last Updated</TableCell>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Valor</TableCell>
+              <TableCell>Ultima actualización</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -197,7 +200,6 @@ function VariableEditor() {
                     }
                   />
                 </TableCell>
-                <TableCell>{getDateFormat(variable.created)}</TableCell>
                 <TableCell>{getDateFormat(variable.updated)}</TableCell>
               </TableRow>
             ))}

@@ -8,7 +8,7 @@ import Button from "@mui/material/Button";
 import ContractModalTabs from "./ContractModalTabs";
 
 import { useDispatch } from "react-redux";
-import { processRequestToObj } from "@/pages/index";
+import { processRequestToObj, sendMessageAction } from "@/pages/index";
 
 interface ModalProps {
   reload: (model_id: string | string[] | undefined) => void;
@@ -83,6 +83,11 @@ export default function PostContract(props: ModalProps) {
             handleClose();
             setName("");
             setHourlyCost("");
+            sendMessageAction(
+              "success",
+              "Se creó el contrato correctamente",
+              dispatch
+            );
           }
         });
     }

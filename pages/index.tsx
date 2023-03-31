@@ -7,8 +7,14 @@ import { Dispatch } from "react";
 import { dataPageAction, MESSAGE_INFO_EVENT } from "@/src/actions/dataPage";
 import { breadcrumbAction, RELOAD_EVENT } from "@/src/actions/breadcrumb";
 
-export const sortByNameAsc = (a: TCustomer | TContract, b: TCustomer | TContract) => a.name.localeCompare(b.name);
-export const sortByNameDesc = (a: TCustomer | TContract, b: TCustomer | TContract) => b.name.localeCompare(a.name);
+export const sortByNameAsc = (
+  a: TCustomer | TContract,
+  b: TCustomer | TContract
+) => a.name.localeCompare(b.name);
+export const sortByNameDesc = (
+  a: TCustomer | TContract,
+  b: TCustomer | TContract
+) => b.name.localeCompare(a.name);
 
 export const handleBreadCrumb = async (
   router: NextRouter,
@@ -39,15 +45,7 @@ export function processRequest(
   response: Response
 ) {
   if (response.status < 200 || response.status >= 400) {
-    dispatch(
-      dataPageAction(MESSAGE_INFO_EVENT, {
-        messageInfo: {
-          severity: severity,
-          message: message,
-          show: true,
-        },
-      })
-    );
+    sendMessageAction(severity, message, dispatch);
     return [];
   }
   return response.json();
@@ -60,15 +58,7 @@ export function processRequestToObj(
   response: Response
 ) {
   if (response.status < 200 || response.status >= 400) {
-    dispatch(
-      dataPageAction(MESSAGE_INFO_EVENT, {
-        messageInfo: {
-          severity: severity,
-          message: message,
-          show: true,
-        },
-      })
-    );
+    sendMessageAction(severity, message, dispatch);
     return undefined;
   }
   return response.json();
@@ -81,19 +71,28 @@ export function processRequestNonReponse(
   response: Response
 ) {
   if (response.status < 200 || response.status >= 400) {
-    dispatch(
-      dataPageAction(MESSAGE_INFO_EVENT, {
-        messageInfo: {
-          severity: severity,
-          message: message,
-          show: true,
-        },
-      })
-    );
+    sendMessageAction(severity, message, dispatch);
     return true;
   }
   return false;
 }
+
+export function sendMessageAction(
+  severity: AlertColor,
+  message: string,
+  dispatch: Dispatch<AnyAction>
+) {
+  dispatch(
+    dataPageAction(MESSAGE_INFO_EVENT, {
+      messageInfo: {
+        severity: severity,
+        message: message,
+        show: true,
+      },
+    })
+  );
+}
+
 export default function Home() {
   return <Customer />;
 }
