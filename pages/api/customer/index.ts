@@ -6,7 +6,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<[TCustomer]>
 ) {
-  console.log('API_ENDPOINT', process.env.API_ENDPOINT)
   if (req.method === "POST") {
     // Process a POST request
     const postData = async () => {
