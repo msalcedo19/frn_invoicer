@@ -57,7 +57,7 @@ const styles = {
     paddingTop: "10px",
   },
 };
-export default function InvoiceCard({
+export function InvoiceCard({
   invoice,
   checkedList,
   setCheckedList,

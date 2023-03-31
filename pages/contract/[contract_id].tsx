@@ -1,6 +1,5 @@
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
-import InvoiceCard from "@/components/Invoice/InvoiceCard";
 
 import Button from "@mui/material/Button";
 import { useEffect, Fragment, useState, ChangeEvent } from "react";
@@ -17,6 +16,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import PostInvoiceModal from "@/components/Invoice/InvoiceModal";
+import { InvoiceCard } from "@/components/Invoice/InvoiceCard";
 import Box from "@mui/material/Box";
 
 import {
@@ -32,8 +32,10 @@ import {
   handleBreadCrumb,
 } from "@/pages/index";
 
-const sortByNameAsc = (a: TInvoice, b: TInvoice) => a.number_id.toString().localeCompare(b.number_id.toString());
-const sortByNameDesc = (a: TInvoice, b: TInvoice) => b.number_id.toString().localeCompare(a.number_id.toString());
+const sortByNameAsc = (a: TInvoice, b: TInvoice) =>
+  a.number_id.toString().localeCompare(b.number_id.toString());
+const sortByNameDesc = (a: TInvoice, b: TInvoice) =>
+  b.number_id.toString().localeCompare(a.number_id.toString());
 
 export default function CustomerDetail() {
   const [invoices, setInvoices] = useState<TInvoice[]>([]);
