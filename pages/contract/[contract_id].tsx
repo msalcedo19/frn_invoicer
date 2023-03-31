@@ -15,7 +15,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import PostInvoiceModal from "@/components/Invoice/InvoiceModal";
+import { PostInvoiceModal } from "@/components/Invoice/InvoiceModal";
 import { InvoiceCard } from "@/components/Invoice/InvoiceCard";
 import Box from "@mui/material/Box";
 

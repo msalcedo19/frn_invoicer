@@ -23,7 +23,7 @@ const style = {
   p: 4,
 };
 
-const PostInvoiceModal = ({
+export const PostInvoiceModal = ({
   model_id,
   contract_id,
   create_new_invoice,
@@ -231,5 +231,3 @@ const PostInvoiceModal = ({
     </Modal>
   );
 };
-
-export default PostInvoiceModal;
