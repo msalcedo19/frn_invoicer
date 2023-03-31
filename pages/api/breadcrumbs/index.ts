@@ -4,13 +4,12 @@ import { API_ENDPOINT } from "config";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<[TCustomer]>
+  res: NextApiResponse
 ) {
-  console.log('API_ENDPOINT', process.env.API_ENDPOINT)
   if (req.method === "POST") {
     // Process a POST request
     const postData = async () => {
-      const response = await fetch(`${API_ENDPOINT}/customer/`, {
+      const response = await fetch(`${API_ENDPOINT}/breadcrumbs/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -19,17 +18,17 @@ export default async function handler(
       });
       return response.json();
     };
-    const data = await postData();
+    const data = await postData()
     res.status(200).json(data);
   } else {
     // Handle any other HTTP method
     const getData = async () => {
-      const response = await fetch(`${API_ENDPOINT}/customer/`, {
+      const response = await fetch(`${API_ENDPOINT}/breadcrumbs/`, {
         method: "GET",
       });
       return response.json();
     };
-    const data = await getData();
+    const data = await getData()
     res.status(200).json(data);
   }
 }

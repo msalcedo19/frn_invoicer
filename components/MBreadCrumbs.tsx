@@ -11,7 +11,6 @@ import { useDispatch } from "react-redux";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { breadcrumbAction, RELOAD_EVENT } from "@/src/actions/breadcrumb";
 import { Box } from "@mui/material";
-import { API_ENDPOINT } from "config";
 
 const RefreshButton = styled(Button)({
   backgroundColor: "#1976d2",
@@ -29,7 +28,7 @@ export default function BasicBreadcrumbs() {
 
   const handleClick = async () => {
     const currentRoute = router.asPath;
-    fetch(`${API_ENDPOINT}/breadcrumbs/`, {
+    fetch(`/api/breadcrumbs/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -185,7 +185,7 @@ export function InvoiceCard({
           }}
         />
         <CardContent sx={{ flexGrow: 1 }} style={styles.content}>
-          {invoice.files != undefined && invoice.files.length > 0 && (
+          {invoice.files != undefined && invoice.files.length > 0 && invoice.files[0].s3_pdf_url && (
             <Link target="_blank" href={invoice.files[0].s3_pdf_url}>
               <Grid
                 container
