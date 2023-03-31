@@ -11,7 +11,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import PostInvoiceModal from "@/components/Invoice/InvoiceModal";
+import { PostInvoiceModal } from "@/components/Invoice/InvoiceModal";
 import Box from "@mui/material/Box";
 
 import { useDispatch } from "react-redux";
