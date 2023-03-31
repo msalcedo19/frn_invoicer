@@ -180,7 +180,7 @@ const PostInvoiceModal = ({
                 label="Reason"
                 fullWidth
                 value={reason}
-                onChange={setReason}
+                onChange={(e) => setReason(e.target.value)}
               />
             </Grid>
           )}

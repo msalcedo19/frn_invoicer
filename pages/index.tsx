@@ -8,8 +8,8 @@ import { dataPageAction, MESSAGE_INFO_EVENT } from "@/src/actions/dataPage";
 import { breadcrumbAction, RELOAD_EVENT } from "@/src/actions/breadcrumb";
 import { API_ENDPOINT } from "config";
 
-export const sortByNameAsc = (a, b) => a.name.localeCompare(b.name);
-export const sortByNameDesc = (a, b) => b.name.localeCompare(a.name);
+export const sortByNameAsc = (a: TCustomer | TContract, b: TCustomer | TContract) => a.name.localeCompare(b.name);
+export const sortByNameDesc = (a: TCustomer | TContract, b: TCustomer | TContract) => b.name.localeCompare(a.name);
 
 export const handleBreadCrumb = async (
   router: NextRouter,

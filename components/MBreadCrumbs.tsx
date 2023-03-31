@@ -13,9 +13,6 @@ import { breadcrumbAction, RELOAD_EVENT } from "@/src/actions/breadcrumb";
 import { Box } from "@mui/material";
 import { API_ENDPOINT } from "config";
 
-function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-  console.info("You clicked a breadcrumb.");
-}
 const RefreshButton = styled(Button)({
   backgroundColor: "#1976d2",
   color: "#fff",
@@ -67,7 +64,7 @@ export default function BasicBreadcrumbs() {
       </Breadcrumbs>
       <Box sx={{ mx: 2 }} />
       <RefreshButton onClick={handleClick}>
-        <RefreshIcon fontSize="xx-small" />
+        <RefreshIcon fontSize="small" />
       </RefreshButton>
     </Box>
   );

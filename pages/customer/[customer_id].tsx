@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import PostContract from "@/components/Contract/ContractModal";
-import { useEffect, Fragment, useState } from "react";
+import { useEffect, Fragment, useState, ChangeEvent } from "react";
 
 import OptionsButton from "@/components/OptionsButton";
 import List from "@mui/material/List";
@@ -40,9 +40,6 @@ const styles = {
     width: "100%",
     textAlign: "center",
   },
-  optionsButton: {
-    marginBottom: "50px",
-  },
   button: {
     color: "white",
     fontWeight: "bold",
@@ -64,7 +61,7 @@ export default function CustomerDetail() {
   } = useRouter();
 
   const [searchTerm, setSearchTerm] = useState("");
-  function handleSearch(event) {
+  function handleSearch(event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
     const term = event.target.value;
     setSearchTerm(term);
     const filtered = objList.filter((obj) =>
@@ -209,7 +206,6 @@ export default function CustomerDetail() {
           function_1={delete_obj}
           function_2={() => setDeleteOp(false)}
           check_or_cancel={deleteOp}
-          sx={styles.optionsButton}
         >
           <List>
             <ListItem key={"new_key"} disablePadding>

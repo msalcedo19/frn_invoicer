@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import { Card, CardContent, Typography } from "@mui/material";
 import Link from "next/link";
 
-import { Dispatch, SetStateAction, Fragment, useState } from "react";
+import { Dispatch, SetStateAction, Fragment, useState, ChangeEvent, CSSProperties } from "react";
 import { useDispatch } from "react-redux";
 
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
@@ -21,11 +21,11 @@ const styles = {
     overflow: "visible",
     boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
     borderRadius: "10px",
-  },
+  } as CSSProperties,
   content: {
     paddingBottom: "16px !important",
     textAlign: "center",
-  },
+  } as CSSProperties,
   title: {
     fontWeight: "bold",
     fontSize: "20px",
@@ -34,7 +34,7 @@ const styles = {
     overflow: "hidden",
     whiteSpace: "nowrap",
     cursor: "pointer",
-  },
+  } as CSSProperties,
   subtitle: {
     color: "gray",
     fontSize: "16px",
@@ -47,7 +47,7 @@ const styles = {
     position: "absolute",
     top: "10px",
     right: "10px",
-  },
+  } as CSSProperties,
   actions: {
     justifyContent: "flex-end",
     borderTop: "1px solid #ccc",
@@ -95,7 +95,7 @@ export default function CustomerCard({
   const [isEditable, setIsEditable] = useState(false);
   const [editedName, setEditedName] = useState(customer.name);
 
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setEditedName(e.target.value);
   };
 

@@ -32,8 +32,8 @@ import {
   handleBreadCrumb,
 } from "@/pages/index";
 
-const sortByNameAsc = (a, b) => a.number_id.toString().localeCompare(b.name);
-const sortByNameDesc = (a, b) => b.number_id.toString().localeCompare(a.name);
+const sortByNameAsc = (a: TInvoice, b: TInvoice) => a.number_id.toString().localeCompare(b.number_id.toString());
+const sortByNameDesc = (a: TInvoice, b: TInvoice) => b.number_id.toString().localeCompare(a.number_id.toString());
 
 export default function CustomerDetail() {
   const [invoices, setInvoices] = useState<TInvoice[]>([]);

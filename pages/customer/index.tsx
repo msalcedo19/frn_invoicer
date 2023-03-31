@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import PostModal from "@/components/Customer/CustomerModal";
-import { useEffect, Fragment, useState } from "react";
+import { useEffect, Fragment, useState, ChangeEvent } from "react";
 
 import OptionsButton from "@/components/OptionsButton";
 import List from "@mui/material/List";
@@ -61,7 +61,7 @@ export default function Customer() {
   const handleClose = () => setOpen(false);
 
   const [searchTerm, setSearchTerm] = useState("");
-  function handleSearch(event) {
+  function handleSearch(event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
     const term = event.target.value;
     setSearchTerm(term);
     const filtered = objList.filter((obj) =>
@@ -194,7 +194,6 @@ export default function Customer() {
           function_1={delete_obj}
           function_2={() => setDeleteOp(false)}
           check_or_cancel={deleteOp}
-          sx={styles.optionsButton}
         >
           <List>
             <ListItem key={"new_key"} disablePadding>

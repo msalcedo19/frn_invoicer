@@ -8,7 +8,7 @@ import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, ChangeEvent, CSSProperties } from "react";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ButtonBase from "@mui/material/ButtonBase";
 
@@ -33,7 +33,7 @@ const styles = {
     whiteSpace: "nowrap",
     cursor: "pointer",
     textAlign: "center",
-  },
+  } as CSSProperties,
   card: {
     maxWidth: 345,
     margin: "auto",
@@ -42,15 +42,15 @@ const styles = {
     overflow: "visible",
     boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
     borderRadius: "10px",
-  },
+  } as CSSProperties,
   content: {
     paddingY: "16px !important",
-  },
+  } as CSSProperties,
   checkbox: {
     position: "absolute",
     top: "10px",
     right: "10px",
-  },
+  } as CSSProperties,
   actions: {
     justifyContent: "flex-end",
     borderTop: "1px solid #ccc",
@@ -99,7 +99,7 @@ export default function InvoiceCard({
 
   const [isEditable, setIsEditable] = useState(false);
   const [editedName, setEditedName] = useState(invoice.number_id.toString());
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setEditedName(e.target.value);
   };
   const handleNameClick = () => {
@@ -217,7 +217,6 @@ export default function InvoiceCard({
               href={`/invoice/${invoice.id}`}
               onClick={handleClick}
               color="inherit"
-              sx={{ fontWeight: 700 }}
             >
               Ver Versiones
             </Link>

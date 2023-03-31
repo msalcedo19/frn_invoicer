@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
-import { API_ENDPOINT } from "config";
+const API_ENDPOINT = process.env.API_ENDPOINT || "http://127.0.0.1:8000";
+
 const nextConfig = {
   reactStrictMode: true,
   async rewrites() {
