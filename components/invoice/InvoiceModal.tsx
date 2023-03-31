@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Grid, Modal, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import InvoiceModalBillTo from "./InvoiceModalBillTo";
+import InvoiceModalBillTo from "@/components/Invoice/InvoiceModalBillTo";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
