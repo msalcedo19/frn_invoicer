@@ -58,7 +58,7 @@ const styles = {
   actions: {
     justifyContent: "flex-end",
     borderTop: "1px solid #ccc",
-    paddingTop: "10px",
+    paddingTop: "10px"
   },
 };
 

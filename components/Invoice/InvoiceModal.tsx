@@ -3,8 +3,12 @@ import { Box, Button, Grid, Modal, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
 
 import InvoiceModalBillTo from "@/components/Invoice/InvoiceModalBillTo";
-import { processRequestToObj, sendMessageAction } from "@/pages/index";
+import { processRequestToObj, sendMessageAction, style } from "@/pages/index";
 import { useDispatch } from "react-redux";
+
+import CircularProgress, {
+  CircularProgressProps,
+} from "@mui/material/CircularProgress";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
@@ -14,17 +18,6 @@ interface PostFileModalProps {
   handleClose: () => void;
   reload: () => void;
 }
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 500,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
 
 export const PostInvoiceModal = ({
   model_id,
@@ -36,6 +29,7 @@ export const PostInvoiceModal = ({
 }: PostFileModalProps) => {
   const [file, setFile] = useState<Blob>();
   const [error, setError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [invoice_id, setInvoiceId] = useState("");
   const [reason, setReason] = useState("Cleaning Services");
 
@@ -57,7 +51,7 @@ export const PostInvoiceModal = ({
       .fetch(`/api/global`)
       .then((response) => response.json())
       .then((data) => {
-        if(data){
+        if (data) {
           setTax1(data[0]);
           setTax2(data[1]);
         }
@@ -74,7 +68,9 @@ export const PostInvoiceModal = ({
 
   const dispatch = useDispatch();
   function postFile() {
-    if (create_new_invoice && contract_id && invoice_id && billTo) {
+    if (create_new_invoice && contract_id && invoice_id && billTo && !loading) {
+      setLoading(true);
+
       let newInvoice = {
         number_id: +invoice_id,
         reason: reason,
@@ -86,6 +82,7 @@ export const PostInvoiceModal = ({
         contract_id: contract_id,
         bill_to_id: billTo.id,
       };
+
       window
         .fetch(`/api/invoice/`, {
           method: "POST",
@@ -131,6 +128,9 @@ export const PostInvoiceModal = ({
                   "Se creó la factura correctamente",
                   dispatch
                 );
+
+                setFile(undefined);
+                setLoading(false);
               });
           } else if (!file) {
             setError(true);
@@ -139,9 +139,15 @@ export const PostInvoiceModal = ({
               "Hubo un error creando la factura, por favor intentelo nuevamente",
               dispatch
             );
+
+            setLoading(false);
           }
         });
-    } else if (file && model_id) {
+    } else if (create_new_invoice && !loading) {
+      sendMessageAction("warning", "Falta rellenar algunos campos", dispatch);
+    } else if (file && model_id && !loading) {
+      setLoading(true);
+
       let info_data = new FormData();
       info_data.append("invoice_id", model_id.toString());
       info_data.append("file", file);
@@ -167,6 +173,9 @@ export const PostInvoiceModal = ({
             "Se creó la factura correctamente",
             dispatch
           );
+
+          setFile(undefined);
+          setLoading(false);
         });
     }
   }
@@ -174,6 +183,8 @@ export const PostInvoiceModal = ({
   const handleSetInvoiceId = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInvoiceId(event.target.value);
   };
+
+  style.width = 500;
 
   return (
     <Modal
@@ -183,10 +194,10 @@ export const PostInvoiceModal = ({
       aria-describedby="modal-modal-description"
     >
       <Box component="form" sx={style}>
-        <Typography variant="h6" align="center">
-          Subir archivo para procesar
+        <Typography variant="h6" align="center" className="post-title">
+          Generar factura
         </Typography>
-        <Grid container spacing={2} mt={2}>
+        <Grid container spacing={2}>
           {contract_id && (
             <Grid item xs={12}>
               <TextField
@@ -214,12 +225,20 @@ export const PostInvoiceModal = ({
               setChooseBillTo={setChooseBillTo}
             />
           </Grid>
+
+          <Grid item xs={12}>
+            <hr />
+          </Grid>
+
           <Grid item xs={6}>
             <Button
               variant="contained"
               component="label"
               fullWidth
-              sx={{ height: "100%" }}
+              sx={{
+                height: "100%",
+                backgroundColor: file ? "green" : "primary",
+              }}
             >
               Subir archivo
               <input
@@ -229,9 +248,6 @@ export const PostInvoiceModal = ({
                 onChange={uploadToClient}
               />
             </Button>
-            {file && (
-              <Typography mt={1}>Archivo seleccionado: {file.name}</Typography>
-            )}
           </Grid>
           <Grid item xs={6}>
             <Button
@@ -243,11 +259,30 @@ export const PostInvoiceModal = ({
             >
               Procesar archivo
             </Button>
+          </Grid>
+          <Grid item xs={12}>
+            {file && (
+              <Typography sx={{ fontStyle: "italic", color: "gray" }}>
+                Archivo seleccionado: {file.name}
+              </Typography>
+            )}
+          </Grid>
+          <Grid item xs={12}>
             {error && (
-              <Typography color="error" mt={1}>
+              <Typography color="error">
                 Hubo un error procesando el archivo. Por favor, intenta de
                 nuevo.
               </Typography>
+            )}
+          </Grid>
+          <Grid item xs={12} sx={{ textAlign: "center" }}>
+            {loading && (
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <CircularProgress />
+                <Typography variant="body1" mt={1}>
+                  Subiendo...
+                </Typography>
+              </Box>
             )}
           </Grid>
         </Grid>

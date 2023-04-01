@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
 import { useDispatch } from "react-redux";
-import { processRequestToObj, sendMessageAction } from "@/pages/index";
+import { processRequestToObj, sendMessageAction, style } from "@/pages/index";
 
 interface ModalProps {
   reload: () => void;
@@ -66,20 +66,9 @@ export default function PostModal(props: ModalProps) {
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 400,
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: 4,
-        }}
-      >
-        <Typography variant="h6" gutterBottom>
-          Crear nueva empresa/contrato
+      <Box sx={style}>
+        <Typography variant="h6" gutterBottom className="post-title">
+          Crear nuevo cliente
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -95,7 +84,7 @@ export default function PostModal(props: ModalProps) {
         <Box sx={{ my: 2 }}>
           <hr />
         </Box>
-        <Box sx={{ my: 2 }}>
+        <Box sx={{ mt: 2, textAlign: "center" }}>
           <Button variant="contained" onClick={handleCreateClick}>
             Crear
           </Button>

@@ -8,7 +8,7 @@ import Button from "@mui/material/Button";
 import ContractModalTabs from "./ContractModalTabs";
 
 import { useDispatch } from "react-redux";
-import { processRequestToObj, sendMessageAction } from "@/pages/index";
+import { processRequestToObj, sendMessageAction, style } from "@/pages/index";
 
 interface ModalProps {
   reload: (model_id: string | string[] | undefined) => void;
@@ -108,24 +108,21 @@ export default function PostContract(props: ModalProps) {
     handleClose();
   };
 
+  style.width = 400;
+
   return (
     <Modal open={open} onClose={handleClose}>
       <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 400,
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: 4,
-        }}
+        sx={style}
       >
-        <Typography variant="h6" gutterBottom>
+        <Typography
+          variant="h6"
+          gutterBottom
+          className="post-title"
+        >
           Crear nueva contrato
         </Typography>
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <Grid item xs={12}>
             <TextField
               label="Nombre"
@@ -156,6 +153,9 @@ export default function PostContract(props: ModalProps) {
           phone={phone}
         />
         <Box sx={{ my: 2 }}>
+          <hr />
+        </Box>
+        <Box sx={{ mt: 2, textAlign: "center" }}>
           <Button variant="contained" onClick={handleCreateClick}>
             Crear
           </Button>

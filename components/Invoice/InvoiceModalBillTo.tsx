@@ -22,7 +22,7 @@ export default function InvoiceModalBillTo(props: ModalBillToProps) {
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">To</InputLabel>
+        <InputLabel id="demo-simple-select-label">Para</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
