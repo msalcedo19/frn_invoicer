@@ -31,7 +31,7 @@ export default function Footer() {
         mt: 8,
       }}
     >
-      <Copyright sx={{ mt: 5 }} />
+      <Copyright sx={{ my: 5 }} />
     </Container>
   );
 }
