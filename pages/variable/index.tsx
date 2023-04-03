@@ -272,7 +272,7 @@ function VariableEditor() {
   }
 
   function postObj() {
-    if ((to, address, phone, email)) {
+    if (to && address && phone && email) {
       let newBillto = {
         to: to,
         addr: address,
@@ -315,7 +315,8 @@ function VariableEditor() {
             );
           }
         });
-    }
+    } else
+      sendMessageAction("warning", "Falta rellenar algunos campos", dispatch);
   }
   style.width = 500;
   return (
