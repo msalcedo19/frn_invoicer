@@ -5,6 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { Dispatch } from "react";
+import { Typography } from "@mui/material";
 
 interface ModalBillToProps {
   billTos: TBillTo[];
@@ -35,6 +36,11 @@ export default function InvoiceModalBillTo(props: ModalBillToProps) {
               {billTo.to}
             </MenuItem>
           ))}
+          {props.billTos.length == 0 && (
+            <MenuItem>
+              <Typography>Aún no existe ningún destinatario</Typography>
+            </MenuItem>
+          )}
         </Select>
       </FormControl>
     </Box>

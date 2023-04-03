@@ -277,7 +277,7 @@ function VariableEditor() {
         to: to,
         addr: address,
         phone: phone,
-        emai: email,
+        email: email,
       };
       window
         .fetch("/api/billTo", {

@@ -52,9 +52,6 @@ export default function Navbar() {
           <Button style={styles.navLink}>
             <Link href="/variable">Variables</Link>
           </Button>
-          <Button style={styles.navLink}>
-            <Link href="#">Reportar</Link>
-          </Button>
         </div>
       </Toolbar>
     </AppBar>

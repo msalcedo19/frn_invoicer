@@ -145,7 +145,9 @@ export default function ContractCard({
         {deleteOp && (
           <Checkbox
             style={styles.checkbox}
-            checked={checkedList && checkedList.get(contract.id) == true ? true : false}
+            checked={
+              checkedList && checkedList.get(contract.id) == true ? true : false
+            }
             onChange={(e) => handleChange(contract.id, e)}
           />
         )}
@@ -173,7 +175,7 @@ export default function ContractCard({
             ${contract.price_unit}/hour
           </Typography>
           <Typography variant="body2" component="p">
-            {contract.num_invoices} facturas
+            {contract.num_invoices ? contract.num_invoices : 0} facturas
           </Typography>
         </CardContent>
         <CardActions style={styles.actions}>
