@@ -310,7 +310,7 @@ export function InvoiceCard({
         <CardActions style={styles.actions}>
           <Button size="small" disabled={invoice.files[0] ? false : true}>
             <Link
-              href={`/file/${
+              href={`/files/${
                 invoice.files[0] ? invoice.files[0].id : undefined
               }`}
               onClick={handleClick}

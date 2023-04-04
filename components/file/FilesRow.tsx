@@ -83,7 +83,7 @@ export default function FilesRow(props: FilesRowProps) {
               {formattedDate} {date.getHours()}:{date.getMinutes()}
             </Typography>
             <Button size="small">
-              <Link href={`/file/${props.file.id}`} color="inherit">
+              <Link href={`/files/${props.file.id}`} color="inherit">
                 Contratos
               </Link>
             </Button>

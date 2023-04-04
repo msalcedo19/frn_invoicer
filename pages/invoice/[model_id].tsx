@@ -115,7 +115,7 @@ export default function CustomerDetail() {
     <Fragment>
       <PostInvoiceModal
         model_id={model_id}
-        contract_id={undefined}
+        customer_id={undefined}
         create_new_invoice={false}
         open={open}
         handleClose={handleClose}
