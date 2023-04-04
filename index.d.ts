@@ -1,60 +1,66 @@
 type TCustomer = {
   id: number;
   name: string;
-  contracts: TContract[];
+  invoices: TInvoice[];
+  num_invoices;
+  number;
 };
 
 type TContract = {
   id: number;
-  name: string;
+  title: str;
+  amount: number;
+  currency: str;
+  hours: number;
   price_unit: number;
-  invoices: Array[TInvoice]
-  num_invoices; number;
+  file_id: number;
 };
 
 type TInvoice = {
-  id: number
-  number_id: number
-  reason: string
-  subtotal: number
+  id: number;
+  number_id: number;
+  reason: string;
+  subtotal: number;
   tax_1: number;
   tax_2: number;
-  created: Date
-  updated: Date
-  customer_id: number
-  files: Array[TFile]
-}
+  created: Date;
+  updated: Date;
+  customer_id: number;
+  files: TFile[];
+};
 
 type TFile = {
-  id: number
-  s3_xlsx_url: string
-  s3_pdf_url: string
-  created: Date
-  invoice_id: number
-}
+  id: number;
+  s3_xlsx_url: string;
+  s3_pdf_url: string;
+  created: Date;
+  invoice_id: number;
+  bill_to_id: number;
+  services: TContract[];
+};
 
 type TTopInfo = {
-  id: number
-  ti_from: string
-  addr: string
-  email: string
-  phone: string
-}
+  id: number;
+  ti_from: string;
+  addr: string;
+  email: string;
+  phone: string;
+};
 
 type TGlobal = {
-  id: number
-  name: str
-  value: str
-  created: string
-  updated: string
-}
+  id: number;
+  name: str;
+  value: str;
+  created: string;
+  updated: string;
+};
 
 type TBillTo = {
   id: number;
-  to: string
-  addr: string
-  phone: string
-  email: string
+  to: string;
+  addr: string;
+  phone: string;
+  email: string;
 };
 
 type Props = {
@@ -62,6 +68,6 @@ type Props = {
 };
 
 type TCheckedBox = {
-  model_id: number,
-  value: bool
+  model_id: number;
+  value: bool;
 };

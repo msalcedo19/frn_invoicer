@@ -2,7 +2,6 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
-import PostContract from "@/components/Contract/ContractModal";
 import { useEffect, Fragment, useState, ChangeEvent } from "react";
 
 import OptionsButton from "@/components/OptionsButton";
@@ -13,29 +12,28 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import CreateIcon from '@mui/icons-material/Create';
-import DeleteIcon from '@mui/icons-material/Delete';
+import CreateIcon from "@mui/icons-material/Create";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 
 import { Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
-import ContractCard from "@/components/Contract/ContractCard";
 
 import {
   breadcrumbAction,
   BACK_EVENT,
-  CONTRACT,
+  INVOICE,
 } from "@/src/actions/breadcrumb";
 import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
 import {
-  sortByNameDesc,
-  sortByNameAsc,
   processRequest,
   processRequestNonReponse,
   handleBreadCrumb,
   sendMessageAction,
 } from "@/pages/index";
+import { InvoiceCard } from "@/components/Invoice/InvoiceCard";
+import { PostInvoiceModal } from "@/components/Invoice/InvoiceModal";
 
 const styles = {
   container: {
@@ -53,8 +51,13 @@ const styles = {
   },
 };
 
+const sortByNameAsc = (a: TInvoice, b: TInvoice) =>
+  a.number_id.toString().localeCompare(b.number_id.toString());
+const sortByNameDesc = (a: TInvoice, b: TInvoice) =>
+  b.number_id.toString().localeCompare(a.number_id.toString());
+
 export default function CustomerDetail() {
-  const [objList, setObjList] = useState<TContract[]>([]);
+  const [objList, setObjList] = useState<TInvoice[]>([]);
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -70,7 +73,7 @@ export default function CustomerDetail() {
     const term = event.target.value;
     setSearchTerm(term);
     const filtered = objList.filter((obj) =>
-      obj.name.toLowerCase().includes(term.toLowerCase())
+      obj.number_id.toString().toLowerCase().includes(term.toLowerCase())
     );
     setSortedList(filtered);
   }
@@ -96,7 +99,7 @@ export default function CustomerDetail() {
     checkedList.forEach(
       (value: boolean, key: number, map: Map<number, boolean>) => {
         urls.push(
-          window.fetch(`/api/contract/${key}`, {
+          window.fetch(`/api/invoice/${key}`, {
             method: "DELETE",
           })
         );
@@ -108,7 +111,7 @@ export default function CustomerDetail() {
         if (
           processRequestNonReponse(
             "warning",
-            "Uno o varios de los contratos no pudo ser eliminado",
+            "Una o varias facturas no pudieron ser eliminadas",
             dispatch,
             response
           )
@@ -121,16 +124,16 @@ export default function CustomerDetail() {
       if (!failed)
         sendMessageAction("success", "Se eliminaron correctamente", dispatch);
 
-      reload(customer_id);
+      reload();
       setDeleteOp(false);
       setCheckedList(new Map());
     });
   }
 
-  function reload(p_model_id: string | string[] | undefined) {
-    if (p_model_id) {
+  function reload() {
+    if (customer_id) {
       window
-        .fetch(`/api/customer/${p_model_id}`)
+        .fetch(`/api/customer/${customer_id}`)
         .then((response) =>
           processRequest(
             "error",
@@ -140,9 +143,9 @@ export default function CustomerDetail() {
           )
         )
         .then((data) => {
-          if (data && data["contracts"]) {
-            setObjList(data["contracts"]);
-            setSortedList(data["contracts"]);
+          if (data && data["invoices"]) {
+            setObjList(data["invoices"]);
+            setSortedList(data["invoices"]);
           }
         });
     }
@@ -159,26 +162,28 @@ export default function CustomerDetail() {
           value: ``,
           active: true,
         },
-        CONTRACT
+        INVOICE
       )
     );
     dispatch(
       dataPageAction(UPDATE_TITLE, {
-        title: "Contratos",
+        title: "Facturas",
       })
     );
-    reload(customer_id);
+    reload();
 
     if (customer_id) handleBreadCrumb(router, dispatch);
   }, [customer_id]);
 
   return (
     <Fragment>
-      <PostContract
-        customer_id={customer_id ? +customer_id : undefined}
-        reload={reload}
+      <PostInvoiceModal
+        model_id={undefined}
+        customer_id={customer_id}
+        create_new_invoice={true}
         open={open}
         handleClose={handleClose}
+        reload={reload}
       />
       <Grid container spacing={2}>
         <Grid item>
@@ -191,16 +196,17 @@ export default function CustomerDetail() {
         </Grid>
         <Grid item>
           <Button onClick={handleSort} variant="outlined">
-            Ordenar por nombre ({sortOrder === "asc" ? "ascendente" : "descendente"})
+            Ordenar por nombre (
+            {sortOrder === "asc" ? "ascendente" : "descendente"})
           </Button>
         </Grid>
       </Grid>
       <Box sx={{ marginY: 2 }} />
       <Grid container spacing={5} alignItems="flex-end">
         {sortedList.map((obj) => (
-          <ContractCard
+          <InvoiceCard
             key={obj.id}
-            contract={obj}
+            invoice={obj}
             checkedList={checkedList}
             setCheckedList={setCheckedList}
             deleteOp={deleteOp}
@@ -209,7 +215,11 @@ export default function CustomerDetail() {
       </Grid>
       <Container sx={styles.container}>
         {sortedList.length == 0 && (
-          <Typography>{searchTerm.length > 0 ? "Ningún contrato coincide con la busqueda" : "Aún no has creado ningún contrato"}</Typography>
+          <Typography>
+            {searchTerm.length > 0
+              ? "Ninguna factura coincide con la busqueda"
+              : "Aún no has creado ningún factura"}
+          </Typography>
         )}
       </Container>
 
@@ -225,7 +235,7 @@ export default function CustomerDetail() {
                 <ListItemIcon>
                   <CreateIcon />
                 </ListItemIcon>
-                <ListItemText primary={"Crear nueva contrato"} />
+                <ListItemText primary={"Crear nueva factura"} />
               </ListItemButton>
             </ListItem>
             <ListItem key={"delete_key"} disablePadding>
@@ -235,7 +245,7 @@ export default function CustomerDetail() {
                 </ListItemIcon>
                 <ListItemText
                   primary={
-                    "Eliminar contrato (Esto incluye todas las facturas asociadas a este contrato)"
+                    "Eliminar factura (Esto incluye todas los contratos y archivos relacionados con esta)"
                   }
                 />
               </ListItemButton>

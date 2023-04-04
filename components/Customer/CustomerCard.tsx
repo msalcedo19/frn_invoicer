@@ -9,7 +9,6 @@ import Link from "next/link";
 import {
   Dispatch,
   SetStateAction,
-  Fragment,
   useState,
   ChangeEvent,
   CSSProperties,
@@ -58,7 +57,7 @@ const styles = {
   actions: {
     justifyContent: "flex-end",
     borderTop: "1px solid #ccc",
-    paddingTop: "10px"
+    paddingTop: "10px",
   },
 };
 
@@ -173,29 +172,14 @@ export default function CustomerCard({
               {editedName}
             </Typography>
           )}
-          {customer.contracts &&
-            ((customer.contracts.length > 0 && (
-              <Grid container spacing={2}>
-                {customer.contracts.map((contract, index) => (
-                  <Fragment key={contract.id}>
-                    <Grid item xs={6} sx={{ textAlign: "center" }}>
-                      <Typography variant="subtitle1">
-                        {contract.name}
-                      </Typography>
-                    </Grid>
-                  </Fragment>
-                ))}
-              </Grid>
-            )) || (
-              <Typography variant="subtitle1">
-                Aún no se han registrado contratos
-              </Typography>
-            ))}
+          <Typography variant="body2" component="p">
+            {customer.num_invoices ? customer.num_invoices : 0} facturas
+          </Typography>
         </CardContent>
         <CardActions style={styles.actions}>
           <Button size="small">
             <Link href={`/customer/${customer.id}`} onClick={handleClick}>
-              Contratos
+              Facturas
             </Link>
           </Button>
         </CardActions>

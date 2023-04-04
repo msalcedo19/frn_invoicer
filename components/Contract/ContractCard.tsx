@@ -41,7 +41,7 @@ const styles = {
   subtitle: {
     color: "gray",
     fontSize: "16px",
-    marginBottom: "8px",
+    marginBottom: "0px",
     textOverflow: "ellipsis",
     overflow: "hidden",
     whiteSpace: "nowrap",
@@ -70,7 +70,7 @@ export default function ContractCard({
   deleteOp: boolean;
 }) {
   const [isEditable, setIsEditable] = useState(false);
-  const [editedName, setEditedName] = useState(contract.name);
+  const [editedName, setEditedName] = useState(contract.title);
 
   const handleNameChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -81,14 +81,15 @@ export default function ContractCard({
     setIsEditable(true);
   };
 
+  const dispatch = useDispatch();
   const handleNameBlur = () => {
-    if (editedName != contract.name) {
+    if (editedName != contract.title) {
       fetch(`/api/contract/${contract.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: editedName }),
+        body: JSON.stringify({ title: editedName }),
       })
         .then((response) =>
           processRequestToObj(
@@ -99,7 +100,7 @@ export default function ContractCard({
           )
         )
         .then((data) => {
-          if (!data) setEditedName(contract.name);
+          if (!data) setEditedName(contract.title);
           else
             sendMessageAction(
               "success",
@@ -123,21 +124,6 @@ export default function ContractCard({
       }
     }
   }
-
-  const dispatch = useDispatch();
-  const handleClick = () => {
-    dispatch(
-      breadcrumbAction(
-        CHECK_ACTION,
-        {
-          href: `/contract/${contract.id}`,
-          value: `${contract.name}`,
-          active: true,
-        },
-        undefined
-      )
-    );
-  };
 
   return (
     <Grid item xs={12} md={4}>
@@ -172,19 +158,15 @@ export default function ContractCard({
             </Typography>
           )}
           <Typography style={styles.subtitle} variant="subtitle1" component="p">
-            ${contract.price_unit}/hour
+            Precio x hora: ${contract.price_unit}
           </Typography>
-          <Typography variant="body2" component="p">
-            {contract.num_invoices ? contract.num_invoices : 0} facturas
+          <Typography style={styles.subtitle} variant="subtitle1" component="p">
+            Total horas: {contract.hours}
+          </Typography>
+          <Typography style={styles.subtitle} variant="subtitle1" component="p">
+            Total: ${contract.amount}
           </Typography>
         </CardContent>
-        <CardActions style={styles.actions}>
-          <Button size="small">
-            <Link href={`/contract/${contract.id}`} onClick={handleClick}>
-              Facturas
-            </Link>
-          </Button>
-        </CardActions>
       </Card>
     </Grid>
   );

@@ -12,7 +12,7 @@ import CircularProgress, {
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
-  contract_id: string | string[] | undefined;
+  customer_id: string | string[] | undefined;
   create_new_invoice: boolean;
   open: boolean;
   handleClose: () => void;
@@ -21,7 +21,7 @@ interface PostFileModalProps {
 
 export const PostInvoiceModal = ({
   model_id,
-  contract_id,
+  customer_id,
   create_new_invoice,
   open,
   handleClose,
@@ -68,7 +68,7 @@ export const PostInvoiceModal = ({
 
   const dispatch = useDispatch();
   function postFile() {
-    if (create_new_invoice && contract_id && invoice_id && billTo && !loading) {
+    if (create_new_invoice && customer_id && invoice_id && billTo && !loading) {
       setLoading(true);
 
       let newInvoice = {
@@ -79,8 +79,7 @@ export const PostInvoiceModal = ({
         tax_2: tax_2 ? +tax_2.value : undefined,
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
-        contract_id: contract_id,
-        bill_to_id: billTo.id,
+        customer_id: customer_id,
       };
 
       window
@@ -107,6 +106,7 @@ export const PostInvoiceModal = ({
             let info_data = new FormData();
             model_id = data.id.toString();
             info_data.append("invoice_id", data.id.toString());
+            info_data.append("bill_to_id", billTo.id.toString());
             info_data.append("file", file);
             window
               .fetch(`/api/file_manage/`, {
@@ -145,11 +145,12 @@ export const PostInvoiceModal = ({
         });
     } else if (create_new_invoice && !loading) {
       sendMessageAction("warning", "Falta rellenar algunos campos", dispatch);
-    } else if (file && model_id && !loading) {
+    } else if (file && model_id  && billTo && !loading) {
       setLoading(true);
 
       let info_data = new FormData();
       info_data.append("invoice_id", model_id.toString());
+      info_data.append("bill_to_id", billTo.id.toString());
       info_data.append("file", file);
       window
         .fetch(`/api/file_manage/`, {
@@ -198,7 +199,7 @@ export const PostInvoiceModal = ({
           Generar factura
         </Typography>
         <Grid container spacing={2}>
-          {contract_id && (
+          {customer_id && (
             <Grid item xs={12}>
               <TextField
                 label="ID factura"
@@ -209,7 +210,7 @@ export const PostInvoiceModal = ({
               />
             </Grid>
           )}
-          {contract_id && (
+          {customer_id && (
             <Grid item xs={12}>
               <TextField
                 label="Reason"

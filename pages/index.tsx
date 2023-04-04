@@ -7,14 +7,10 @@ import { Dispatch } from "react";
 import { dataPageAction, MESSAGE_INFO_EVENT } from "@/src/actions/dataPage";
 import { breadcrumbAction, RELOAD_EVENT } from "@/src/actions/breadcrumb";
 
-export const sortByNameAsc = (
-  a: TCustomer | TContract,
-  b: TCustomer | TContract
-) => a.name.localeCompare(b.name);
-export const sortByNameDesc = (
-  a: TCustomer | TContract,
-  b: TCustomer | TContract
-) => b.name.localeCompare(a.name);
+export const sortByNameAsc = (a: TCustomer, b: TCustomer) =>
+  a.name.localeCompare(b.name);
+export const sortByNameDesc = (a: TCustomer, b: TCustomer) =>
+  b.name.localeCompare(a.name);
 
 export const handleBreadCrumb = async (
   router: NextRouter,

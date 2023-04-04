@@ -21,6 +21,7 @@ import ButtonBase from "@mui/material/ButtonBase";
 import { useDispatch } from "react-redux";
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
 import { processRequestToObj, sendMessageAction } from "@/pages/index";
+import { useEffect } from "react";
 
 interface Props {
   invoice: TInvoice;
@@ -58,7 +59,7 @@ const styles = {
     right: "10px",
   } as CSSProperties,
   actions: {
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     borderTop: "1px solid #ccc",
     paddingTop: "10px",
   },
@@ -144,6 +145,28 @@ export function InvoiceCard({
     setIsEditable(false);
   };
 
+  const [total, setTotal] = useState(0);
+  const [total_no_taxes, setTotalNoTaxes] = useState(0);
+  const [total_tax_1, setTotalTax1] = useState(0);
+  const [total_tax_2, setTotalTax2] = useState(0);
+  function calculateTotal() {
+    let subtotal = 0;
+    invoice.files[0].services.forEach(
+      (service) => (subtotal += service.amount)
+    );
+    let a_tax_1 = (invoice.tax_1 / 100) * subtotal;
+    let a_tax_2 = (invoice.tax_2 / 100) * subtotal;
+    let a_total = a_tax_1 + a_tax_2 + subtotal;
+    setTotal(a_total);
+    setTotalNoTaxes(subtotal);
+    setTotalTax1(a_tax_1);
+    setTotalTax2(a_tax_2);
+  }
+
+  useEffect(() => {
+    calculateTotal();
+  }, []);
+
   return (
     <Grid item xs={12} sm={6} md={4} sx={{ mb: 2 }}>
       <Card
@@ -226,9 +249,77 @@ export function InvoiceCard({
                 </Grid>
               </Link>
             )}
+
+          <Typography
+            sx={{
+              color: "gray",
+              fontSize: "16px",
+              marginBottom: "0px",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}
+            variant="subtitle1"
+            component="p"
+          >
+            Subtotal: ${total_no_taxes}
+          </Typography>
+          <Typography
+            sx={{
+              color: "gray",
+              fontSize: "16px",
+              marginBottom: "0px",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}
+            variant="subtitle1"
+            component="p"
+          >
+            TPS: ${total_tax_1}
+          </Typography>
+          <Typography
+            sx={{
+              color: "gray",
+              fontSize: "16px",
+              marginBottom: "0px",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}
+            variant="subtitle1"
+            component="p"
+          >
+            TVQ: ${total_tax_2}
+          </Typography>
+          <Typography
+            sx={{
+              color: "gray",
+              fontSize: "16px",
+              marginBottom: "0px",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}
+            variant="subtitle1"
+            component="p"
+          >
+            Total: ${total}
+          </Typography>
         </CardContent>
         <CardActions style={styles.actions}>
-          <Button size="small">
+          <Button size="small" disabled={invoice.files[0] ? false : true}>
+            <Link
+              href={`/file/${
+                invoice.files[0] ? invoice.files[0].id : undefined
+              }`}
+              onClick={handleClick}
+              color="inherit"
+            >
+              Contratos
+            </Link>
+          </Button>
+          <Button size="small" disabled={invoice.files[0] ? false : true}>
             <Link
               href={`/invoice/${invoice.id}`}
               onClick={handleClick}

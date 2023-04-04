@@ -221,7 +221,7 @@ export default function Customer() {
                 </ListItemIcon>
                 <ListItemText
                   primary={
-                    "Eliminar cliente (Esto incluye todos los contratos asociados a este)"
+                    "Eliminar cliente (Esto incluye todos las facturas asociadas a este)"
                   }
                 />
               </ListItemButton>

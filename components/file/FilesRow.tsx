@@ -1,14 +1,15 @@
-import { Dispatch, SetStateAction, useState, Fragment } from "react";
-import React from "react";
+import Button from "@mui/material/Button";
 import ButtonBase from "@mui/material/ButtonBase";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { Typography } from "@mui/material";
 import Link from "@mui/material/Link";
 import Checkbox from "@mui/material/Checkbox";
+
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import BackupTableIcon from "@mui/icons-material/BackupTable";
+import { Dispatch, SetStateAction, useState, Fragment } from "react";
 
 const iconButtonStyles = {
   width: 128,
@@ -81,6 +82,11 @@ export default function FilesRow(props: FilesRowProps) {
             <Typography variant="subtitle1">
               {formattedDate} {date.getHours()}:{date.getMinutes()}
             </Typography>
+            <Button size="small">
+              <Link href={`/file/${props.file.id}`} color="inherit">
+                Contratos
+              </Link>
+            </Button>
           </Grid>
           <Grid item xs={5} sx={{ padding: "0px !important" }}>
             <Link target="_blank" href={props.file.s3_xlsx_url}>

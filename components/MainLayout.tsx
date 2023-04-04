@@ -23,10 +23,10 @@ const MainLayout: React.FC<Props> = ({ children }) => {
         />
       )}
       <Container maxWidth="lg" component="main" sx={{ marginTop: "2.5%" }}>
-        {currentRoute != "/variable" && currentRoute != "/customer" && currentRoute != "/contract" && (
+        {currentRoute != "/variable" && currentRoute != "/customer" && (
           <BasicBreadcrumbs />
         )}
-        <Box sx={{ my: 1 }} />
+        <Box sx={{ my: 2 }} />
         {currentRoute != "/variable" && (
           <Typography variant="h5" component="h2">
             {dataPageState.title}

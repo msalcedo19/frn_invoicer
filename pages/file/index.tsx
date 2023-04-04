@@ -2,25 +2,26 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
-import { useEffect, Fragment, useState, ChangeEvent } from "react";
-import { useRouter } from "next/router";
+import {
+  useEffect,
+  Fragment,
+  useState,
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 
-import {
-  breadcrumbAction,
-  BACK_EVENT,
-  CONTRACT,
-} from "@/src/actions/breadcrumb";
 import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
 import { useDispatch } from "react-redux";
-import {
-  sortByNameDesc,
-  sortByNameAsc,
-  processRequest,
-  handleBreadCrumb,
-} from "@/pages/index";
+import { processRequest } from "@/pages/index";
 import ContractCard from "@/components/Contract/ContractCard";
+
+export const sortByNameAsc = (a: TContract, b: TContract) =>
+  a.title.localeCompare(b.title);
+export const sortByNameDesc = (a: TContract, b: TContract) =>
+  b.title.localeCompare(a.title);
 
 const styles = {
   container: {
@@ -41,9 +42,13 @@ const styles = {
   },
 };
 
-export default function Customer() {
-  const [objList, setObjList] = useState<TContract[]>([]);
-
+export default function Customer({
+  objList,
+  setObjList,
+}: {
+  objList: TContract[];
+  setObjList: Dispatch<SetStateAction<TContract[]>>;
+}) {
   const [searchTerm, setSearchTerm] = useState("");
   function handleSearch(
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -51,7 +56,7 @@ export default function Customer() {
     const term = event.target.value;
     setSearchTerm(term);
     const filtered = objList.filter((obj) =>
-      obj.name.toLowerCase().includes(term.toLowerCase())
+      obj.title.toLowerCase().includes(term.toLowerCase())
     );
     setSortedList(filtered);
   }
@@ -88,7 +93,6 @@ export default function Customer() {
   }
 
   const dispatch = useDispatch();
-  const router = useRouter();
   useEffect(() => {
     dispatch(
       dataPageAction(UPDATE_TITLE, {
