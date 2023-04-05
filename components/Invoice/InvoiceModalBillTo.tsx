@@ -9,6 +9,7 @@ import { Typography } from "@mui/material";
 
 interface ModalBillToProps {
   billTos: TBillTo[];
+  billTo: TBillTo | undefined;
   setChooseBillTo: Dispatch<React.SetStateAction<TBillTo | undefined>>;
 }
 
@@ -27,7 +28,7 @@ export default function InvoiceModalBillTo(props: ModalBillToProps) {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={props.billTos.length > 0 ? props.billTos[0].id.toString() : ""}
+          value={props.billTo ? props.billTo.id.toString(): ""}
           label="Age"
           onChange={handleChange}
         >

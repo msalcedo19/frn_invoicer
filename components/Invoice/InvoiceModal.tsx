@@ -223,6 +223,7 @@ export const PostInvoiceModal = ({
           <Grid item xs={12}>
             <InvoiceModalBillTo
               billTos={billTos}
+              billTo={billTo}
               setChooseBillTo={setChooseBillTo}
             />
           </Grid>
