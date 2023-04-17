@@ -23,7 +23,7 @@ const MainLayout: React.FC<Props> = ({ children }) => {
         />
       )}
       <Container maxWidth="lg" component="main" sx={{ marginTop: "2.5%" }}>
-        {currentRoute != "/variable" && currentRoute != "/customer" && (
+        {currentRoute != "/variable" && currentRoute != "/customer" && currentRoute != "/" && (
           <BasicBreadcrumbs />
         )}
         <Box sx={{ my: 2 }} />

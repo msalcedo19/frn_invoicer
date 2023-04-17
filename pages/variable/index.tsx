@@ -9,9 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 
 import OptionsButton from "@/components/OptionsButton";
 import List from "@mui/material/List";
@@ -24,6 +22,7 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Checkbox from "@mui/material/Checkbox";
+import IconButton from "@mui/material/IconButton";
 import {
   Typography,
   Accordion,
@@ -31,6 +30,7 @@ import {
   AccordionSummary,
 } from "@mui/material";
 import ExpandCircleDownIcon from "@mui/icons-material/ExpandCircleDown";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 
 import { useDispatch } from "react-redux";
 import {
@@ -39,6 +39,8 @@ import {
   style,
   processRequestToObj,
 } from "@/pages/index";
+import UpdateModalVariable from "@/components/Variable/UpdateModal";
+import PostModalVariable from "@/components/Variable/PostModal";
 
 function VariableEditor() {
   const [open, setOpen] = useState(false);
@@ -117,7 +119,7 @@ function VariableEditor() {
     const editedVariable = { ...editedVariables[index], [field]: newValue };
     const newVariables = [...editedVariables];
     newVariables[index] = editedVariable;
-    setEditedVariables(newVariables);
+    sortGlobal(newVariables);
   };
 
   const handleVariableBlur = (
@@ -146,7 +148,7 @@ function VariableEditor() {
       )
       .then((data) => {
         if (data) {
-          setEditedVariables(data);
+          sortGlobal(data);
           sendMessageAction("success", "Se actualizó correctamente", dispatch);
         } else if (previousValue != "") {
           const editedVariable = {
@@ -155,7 +157,7 @@ function VariableEditor() {
           };
           const newVariables = [...editedVariables];
           newVariables[index] = editedVariable;
-          setEditedVariables(newVariables);
+          sortGlobal(newVariables);
           setpreviousValue("");
         }
       });
@@ -215,6 +217,10 @@ function VariableEditor() {
       });
   };
 
+  const sortGlobal = (data: TGlobal[]) => {
+    data.sort((v1, v2) => v1.name.localeCompare(v2.name));
+    setEditedVariables(data);
+  };
   const [billTos, setBillTos] = useState<TBillTo[]>([]);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -222,7 +228,7 @@ function VariableEditor() {
       .fetch(`/api/global/`)
       .then((response) => response.json())
       .then((data) => {
-        setEditedVariables(data);
+        sortGlobal(data);
       });
 
     window
@@ -240,25 +246,6 @@ function VariableEditor() {
       });
   }, []);
 
-  const [to, setTo] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const handleToChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTo(event.target.value);
-  };
-
-  const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress(event.target.value);
-  };
-
-  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPhone(event.target.value);
-  };
-
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
   function handleChange(model_id: any, e: any) {
     let isChecked = e.target.checked;
     // do whatever you want with isChecked value
@@ -270,114 +257,41 @@ function VariableEditor() {
     }
   }
 
-  function postObj() {
-    if (to && address && phone && email) {
-      let newBillto = {
-        to: to,
-        addr: address,
-        phone: phone,
-        email: email,
-      };
-      window
-        .fetch("/api/billTo", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newBillto),
-        })
-        .then((response) =>
-          processRequestToObj(
-            "error",
-            "Hubo un error creando el destinatario, por favor intentelo nuevamente",
-            dispatch,
-            response
-          )
-        )
-        .then((data) => {
-          if (data) {
-            window
-              .fetch(`/api/billTo/`)
-              .then((response) => response.json())
-              .then((data) => {
-                setBillTos(data);
-              });
-            handleClose();
-            setTo("");
-            setAddress("");
-            setPhone("");
-            setEmail("");
-            sendMessageAction(
-              "success",
-              "Se creó el destinatario correctamente",
-              dispatch
-            );
-          }
-        });
-    } else
-      sendMessageAction("warning", "Falta rellenar algunos campos", dispatch);
-  }
+  const [updateBillTo, setUpdateBillTo] = useState<TBillTo>();
+  const [openUpdateBillTo, setOpenUpdateBillTo] = useState(false);
+  const handleOpenBillTo = () => setOpenUpdateBillTo(true);
+  const handleCloseBillTo = () => setOpenUpdateBillTo(false);
+  const reloadBillTo = () => {
+    window
+      .fetch(`/api/billTo/`)
+      .then((response) => response.json())
+      .then((data) => {
+        setBillTos(data);
+        setUpdateBillTo(undefined);
+      });
+  };
+
   style.width = 500;
   return (
     <Fragment>
+      <PostModalVariable
+        open={open}
+        handleClose={handleClose}
+        reload={reloadBillTo}
+      />
+
+      {updateBillTo && (
+        <UpdateModalVariable
+          openUpdateBillTo={openUpdateBillTo}
+          updateBillTo={updateBillTo}
+          handleCloseBillTo={handleCloseBillTo}
+          reloadBillTo={reloadBillTo}
+        />
+      )}
+
       <Typography variant="h5" component="h2" sx={{ marginBottom: "2%" }}>
         Variables
       </Typography>
-      <Modal open={open} onClose={handleClose}>
-        <Box sx={style}>
-          <Typography variant="h6" gutterBottom className="post-title">
-            Crear nuevo destinatario
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Para"
-                fullWidth
-                value={to}
-                onChange={handleToChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Dirección"
-                fullWidth
-                value={address}
-                onChange={handleAddressChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Teléfono"
-                fullWidth
-                value={phone}
-                onChange={handlePhoneChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Correo"
-                fullWidth
-                value={email}
-                onChange={handleEmailChange}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <hr />
-            </Grid>
-            <Grid item xs={12} sx={{ textAlign: "center" }}>
-              <Button
-                variant="contained"
-                fullWidth
-                sx={{ height: "100%" }}
-                onClick={postObj}
-              >
-                Crear
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
-      </Modal>
 
       <TableContainer>
         <Table sx={{ minWidth: 750 }}>
@@ -558,6 +472,7 @@ function VariableEditor() {
                 marginBottom: "16px",
                 borderRadius: "8px",
                 boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
+                position: "relative",
               }}
             >
               <AccordionSummary
@@ -581,6 +496,24 @@ function VariableEditor() {
                   variant="body1"
                   style={{ marginBottom: "4px" }}
                 >{`Email: ${billTo.email}`}</Typography>
+
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "0",
+                    right: "0",
+                    margin: "16px",
+                  }}
+                >
+                  <IconButton
+                    onClick={() => {
+                      setUpdateBillTo(billTo);
+                      handleOpenBillTo();
+                    }}
+                  >
+                    <AutoFixHighIcon />
+                  </IconButton>
+                </div>
               </AccordionDetails>
             </Accordion>
           </Grid>

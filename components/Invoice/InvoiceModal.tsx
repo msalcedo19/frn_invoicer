@@ -91,6 +91,7 @@ export const PostInvoiceModal = ({
           body: JSON.stringify(newInvoice),
         })
         .then((response) => {
+          console.log(response);
           if (response.status < 200 || response.status >= 400) {
             sendMessageAction(
               "error",
@@ -101,11 +102,12 @@ export const PostInvoiceModal = ({
           }
           return response.json();
         })
-        .then((data: TInvoice) => {
-          if (file && data && data.id) {
+        .then((invoice_response: TInvoice) => {
+          console.log(invoice_response);
+          if (file && invoice_response && invoice_response.id) {
             let info_data = new FormData();
-            model_id = data.id.toString();
-            info_data.append("invoice_id", data.id.toString());
+            model_id = invoice_response.id.toString();
+            info_data.append("invoice_id", invoice_response.id.toString());
             info_data.append("bill_to_id", billTo.id.toString());
             info_data.append("file", file);
             window
@@ -119,33 +121,43 @@ export const PostInvoiceModal = ({
                 }
                 return response.json();
               })
-              .then((data) => {
-                reload();
-                handleClose();
-                setInvoiceId("");
-                sendMessageAction(
-                  "success",
-                  "Se creó la factura correctamente",
-                  dispatch
-                );
+              .then((data: TFile) => {
+                if (data && data.id) {
+                  reload();
+                  handleClose();
+                  setInvoiceId("");
+                  sendMessageAction(
+                    "success",
+                    "Se creó la factura correctamente",
+                    dispatch
+                  );
 
-                setFile(undefined);
+                  setFile(undefined);
+                } else {
+                  window.fetch(`/api/invoice/${invoice_response.id}`, {
+                    method: "DELETE",
+                  });
+                  sendMessageAction(
+                    "error",
+                    "Hubo un error creando la factura, por favor intentelo nuevamente",
+                    dispatch
+                  );
+                }
                 setLoading(false);
               });
-          } else if (!file) {
+          } else if (!file || !invoice_response || !invoice_response.id) {
             setError(true);
             sendMessageAction(
               "error",
               "Hubo un error creando la factura, por favor intentelo nuevamente",
               dispatch
             );
-
             setLoading(false);
           }
         });
     } else if (create_new_invoice && !loading) {
       sendMessageAction("warning", "Falta rellenar algunos campos", dispatch);
-    } else if (file && model_id  && billTo && !loading) {
+    } else if (file && model_id && billTo && !loading) {
       setLoading(true);
 
       let info_data = new FormData();
@@ -165,17 +177,19 @@ export const PostInvoiceModal = ({
             response
           )
         )
-        .then((data) => {
-          reload();
-          handleClose();
-          setInvoiceId("");
-          sendMessageAction(
-            "success",
-            "Se creó la factura correctamente",
-            dispatch
-          );
+        .then((data: TFile) => {
+          if (data && data.id) {
+            reload();
+            handleClose();
+            setInvoiceId("");
+            sendMessageAction(
+              "success",
+              "Se creó la factura correctamente",
+              dispatch
+            );
 
-          setFile(undefined);
+            setFile(undefined);
+          }
           setLoading(false);
         });
     }
