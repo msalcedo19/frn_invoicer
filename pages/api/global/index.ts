@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { API_ENDPOINT } from "config";
+import { getHeadersAPI } from "@/pages/api/utils";
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,9 +14,7 @@ export default async function handler(
     const getData = async () => {
       const response = await fetch(`${API_ENDPOINT}/global`, {
         method: "GET",
-        headers: {
-          Authorization: req.headers.authorization,
-        },
+        headers: getHeadersAPI(req),
       });
       return { response: response.json(), status: response.status };
     };

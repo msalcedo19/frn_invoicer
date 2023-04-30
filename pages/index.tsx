@@ -68,7 +68,7 @@ export function processRequest(
     userService.logout();
     return [];
   } else if (response.status < 200 || response.status >= 400) {
-    sendMessageAction(severity, message, dispatch);
+    if (userService.userValue) sendMessageAction(severity, message, dispatch);
     return [];
   }
   return response.json();
@@ -89,7 +89,7 @@ export function processRequestToObj(
     userService.logout();
     return [];
   } else if (response.status < 200 || response.status >= 400) {
-    sendMessageAction(severity, message, dispatch);
+    if (userService.userValue) sendMessageAction(severity, message, dispatch);
     return undefined;
   }
   return response.json();
@@ -110,7 +110,7 @@ export function processRequestNonReponse(
     userService.logout();
     return [];
   } else if (response.status < 200 || response.status >= 400) {
-    sendMessageAction(severity, message, dispatch);
+    if (userService.userValue) sendMessageAction(severity, message, dispatch);
     return true;
   }
   return false;
