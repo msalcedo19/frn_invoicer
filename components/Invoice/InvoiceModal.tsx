@@ -87,8 +87,10 @@ export const PostInvoiceModal = ({
         )
       )
       .then((data) => {
-        setBillTos(data);
-        if (data && data.length > 0) setChooseBillTo(data[0]);
+        if (data && data.length > 0) {
+          setBillTos(data);
+          //setChooseBillTo(data[0]);
+        }
       });
   }, [model_id]);
 
@@ -184,8 +186,6 @@ export const PostInvoiceModal = ({
             setLoading(false);
           }
         });
-    } else if (create_new_invoice && !loading) {
-      sendMessageAction("warning", "Falta rellenar algunos campos", dispatch);
     } else if (file && model_id && billTo && !loading) {
       setLoading(true);
 
@@ -196,7 +196,7 @@ export const PostInvoiceModal = ({
       const requestHeaders: HeadersInit = new Headers();
       requestHeaders.set("Authorization", userService.userValue.token);
       window
-        .fetch(`/api/file_manage/`, {
+        .fetch(`/api/file_manage`, {
           method: "POST",
           headers: requestHeaders,
           body: info_data,
@@ -213,18 +213,20 @@ export const PostInvoiceModal = ({
           if (data && data.id) {
             reload();
             handleClose();
-            setInvoiceId("");
             sendMessageAction(
               "success",
               "Se creó la factura correctamente",
               dispatch
             );
 
+            setInvoiceId("");
             setFile(undefined);
+            setChooseBillTo(undefined);
           }
           setLoading(false);
         });
-    }
+    } else
+      sendMessageAction("warning", "Falta rellenar algunos campos", dispatch);
   }
 
   const handleSetInvoiceId = (event: React.ChangeEvent<HTMLInputElement>) => {
