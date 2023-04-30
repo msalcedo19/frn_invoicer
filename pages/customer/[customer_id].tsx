@@ -31,6 +31,7 @@ import {
   processRequestNonReponse,
   handleBreadCrumb,
   sendMessageAction,
+  getHeaders,
 } from "@/pages/index";
 import { InvoiceCard } from "@/components/Invoice/InvoiceCard";
 import { PostInvoiceModal } from "@/components/Invoice/InvoiceModal";
@@ -101,6 +102,7 @@ export default function CustomerDetail() {
         urls.push(
           window.fetch(`/api/invoice/${key}`, {
             method: "DELETE",
+            headers: getHeaders(),
           })
         );
       }
@@ -133,7 +135,10 @@ export default function CustomerDetail() {
   function reload() {
     if (customer_id) {
       window
-        .fetch(`/api/customer/${customer_id}`)
+        .fetch(`/api/customer/${customer_id}`, {
+          method: "GET",
+          headers: getHeaders(),
+        })
         .then((response) =>
           processRequest(
             "error",

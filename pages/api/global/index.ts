@@ -11,12 +11,17 @@ export default async function handler(
   } else {
     // Handle any other HTTP method
     const getData = async () => {
-      const response = await fetch(`${API_ENDPOINT}/global/`, {
+      const response = await fetch(`${API_ENDPOINT}/global`, {
         method: "GET",
+        headers: {
+          Authorization: req.headers.authorization,
+        },
       });
-      return response.json();
+      return { response: response.json(), status: response.status };
     };
     const data = await getData();
-    res.status(200).json(data);
+    const json = await data.response;
+    const status_response = await data.status;
+    res.status(status_response).json(json);
   }
 }

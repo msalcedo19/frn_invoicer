@@ -16,7 +16,11 @@ import {
 import { useDispatch } from "react-redux";
 
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
-import { processRequestToObj, sendMessageAction } from "@/pages/index";
+import {
+  processRequestToObj,
+  sendMessageAction,
+  getHeaders,
+} from "@/pages/index";
 
 const styles = {
   card: {
@@ -115,9 +119,7 @@ export default function CustomerCard({
     if (editedName != customer.name) {
       fetch(`/api/customer/${customer.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getHeaders(true),
         body: JSON.stringify({ name: editedName }),
       })
         .then((response) =>

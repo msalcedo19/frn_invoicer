@@ -20,7 +20,11 @@ import ButtonBase from "@mui/material/ButtonBase";
 
 import { useDispatch } from "react-redux";
 import { breadcrumbAction, CHECK_ACTION } from "@/src/actions/breadcrumb";
-import { processRequestToObj, sendMessageAction } from "@/pages/index";
+import {
+  processRequestToObj,
+  sendMessageAction,
+  getHeaders,
+} from "@/pages/index";
 import { useEffect } from "react";
 
 interface Props {
@@ -118,9 +122,7 @@ export function InvoiceCard({
     if (editedName != invoice.number_id.toString()) {
       fetch(`/api/invoice/${invoice.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getHeaders(true),
         body: JSON.stringify({ number_id: +editedName }),
       })
         .then((response) =>

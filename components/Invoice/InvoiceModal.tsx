@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Grid, Modal, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import InvoiceModalBillTo from "@/components/Invoice/InvoiceModalBillTo";
-import { processRequestToObj, sendMessageAction, style } from "@/pages/index";
+import {
+  processRequestToObj,
+  sendMessageAction,
+  style,
+  getHeaders,
+  processRequest,
+} from "@/pages/index";
 import { useDispatch } from "react-redux";
-
-import CircularProgress, {
-  CircularProgressProps,
-} from "@mui/material/CircularProgress";
+import { userService } from "@/src/user";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
@@ -48,18 +52,40 @@ export const PostInvoiceModal = ({
 
   useEffect(() => {
     window
-      .fetch(`/api/global`)
-      .then((response) => response.json())
+      .fetch(`/api/global`, {
+        method: "GET",
+        headers: getHeaders(),
+      })
+      .then((response) =>
+        processRequest(
+          "error",
+          "Hubo un error cargando los datos, recargue la página",
+          dispatch,
+          response
+        )
+      )
       .then((data) => {
         if (data) {
-          setTax1(data[0]);
-          setTax2(data[1]);
+          for (let variable of data) {
+            if (variable.identifier == 1) setTax1(variable);
+            else if (variable.identifier == 2) setTax2(variable);
+          }
         }
       });
 
     window
-      .fetch(`/api/billTo/`)
-      .then((response) => response.json())
+      .fetch(`/api/billTo`, {
+        method: "GET",
+        headers: getHeaders(),
+      })
+      .then((response) =>
+        processRequest(
+          "error",
+          "Hubo un error cargando los datos, recargue la página",
+          dispatch,
+          response
+        )
+      )
       .then((data) => {
         setBillTos(data);
         if (data && data.length > 0) setChooseBillTo(data[0]);
@@ -85,13 +111,10 @@ export const PostInvoiceModal = ({
       window
         .fetch(`/api/invoice/`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: getHeaders(true),
           body: JSON.stringify(newInvoice),
         })
         .then((response) => {
-          console.log(response);
           if (response.status < 200 || response.status >= 400) {
             sendMessageAction(
               "error",
@@ -103,25 +126,30 @@ export const PostInvoiceModal = ({
           return response.json();
         })
         .then((invoice_response: TInvoice) => {
-          console.log(invoice_response);
           if (file && invoice_response && invoice_response.id) {
             let info_data = new FormData();
             model_id = invoice_response.id.toString();
             info_data.append("invoice_id", invoice_response.id.toString());
             info_data.append("bill_to_id", billTo.id.toString());
             info_data.append("file", file);
+            const requestHeaders: HeadersInit = new Headers();
+            requestHeaders.set("Authorization", userService.userValue.token);
             window
               .fetch(`/api/file_manage/`, {
                 method: "POST",
+                headers: requestHeaders,
                 body: info_data,
               })
-              .then((response) => {
-                if (response.status < 200 || response.status >= 400) {
-                  return undefined;
-                }
-                return response.json();
-              })
+              .then((response) =>
+                processRequestToObj(
+                  "error",
+                  "Hubo un error creando la factura, por favor intentelo nuevamente",
+                  dispatch,
+                  response
+                )
+              )
               .then((data: TFile) => {
+                console.log(data);
                 if (data && data.id) {
                   reload();
                   handleClose();
@@ -136,6 +164,7 @@ export const PostInvoiceModal = ({
                 } else {
                   window.fetch(`/api/invoice/${invoice_response.id}`, {
                     method: "DELETE",
+                    headers: getHeaders(),
                   });
                   sendMessageAction(
                     "error",
@@ -164,9 +193,12 @@ export const PostInvoiceModal = ({
       info_data.append("invoice_id", model_id.toString());
       info_data.append("bill_to_id", billTo.id.toString());
       info_data.append("file", file);
+      const requestHeaders: HeadersInit = new Headers();
+      requestHeaders.set("Authorization", userService.userValue.token);
       window
         .fetch(`/api/file_manage/`, {
           method: "POST",
+          headers: requestHeaders,
           body: info_data,
         })
         .then((response) =>

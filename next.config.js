@@ -7,7 +7,11 @@ const nextConfig = {
     return [
       {
         source: "/api/file_manage",
-        destination: `${API_ENDPOINT}/upload_file/`,
+        destination: `${API_ENDPOINT}/upload_file`,
+      },
+      {
+        source: "/api/authenticate",
+        destination: `${API_ENDPOINT}/authenticate`,
       },
     ];
   },

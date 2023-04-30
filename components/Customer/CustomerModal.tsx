@@ -7,7 +7,12 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
 import { useDispatch } from "react-redux";
-import { processRequestToObj, sendMessageAction, style } from "@/pages/index";
+import {
+  processRequestToObj,
+  sendMessageAction,
+  style,
+  getHeaders,
+} from "@/pages/index";
 
 interface ModalProps {
   reload: () => void;
@@ -36,9 +41,7 @@ export default function PostModal(props: ModalProps) {
       window
         .fetch("/api/customer", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: getHeaders(true),
           body: JSON.stringify(newCustomer),
         })
         .then((response) =>

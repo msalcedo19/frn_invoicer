@@ -16,7 +16,7 @@ import {
 } from "@/src/actions/breadcrumb";
 import { useDispatch } from "react-redux";
 import { dataPageAction, UPDATE_TITLE } from "@/src/actions/dataPage";
-import { processRequest, handleBreadCrumb } from "@/pages/index";
+import { processRequest, handleBreadCrumb, getHeaders } from "@/pages/index";
 import ContractCard from "@/components/Contract/ContractCard";
 
 const sortByNameAsc = (a: TContract, b: TContract) =>
@@ -57,7 +57,10 @@ export default function FileDetail() {
   function reload() {
     if (file_id)
       window
-        .fetch(`/api/files/${file_id}`)
+        .fetch(`/api/files/${file_id}`, {
+          method: "GET",
+          headers: getHeaders(),
+        })
         .then((response) =>
           processRequest(
             "error",

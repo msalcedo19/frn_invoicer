@@ -23,6 +23,7 @@ import {
   processRequestNonReponse,
   handleBreadCrumb,
   sendMessageAction,
+  getHeaders,
 } from "@/pages/index";
 
 const sortByDateAsc = (a: TFile, b: TFile) =>
@@ -49,6 +50,7 @@ export default function CustomerDetail() {
         urls.push(
           window.fetch(`/api/files/${key}`, {
             method: "DELETE",
+            headers: getHeaders(),
           })
         );
       }
@@ -81,7 +83,10 @@ export default function CustomerDetail() {
   function reload() {
     if (model_id)
       window
-        .fetch(`/api/invoice/${model_id}`)
+        .fetch(`/api/invoice/${model_id}`, {
+          method: "GET",
+          headers: getHeaders(),
+        })
         .then((response) =>
           processRequest(
             "error",

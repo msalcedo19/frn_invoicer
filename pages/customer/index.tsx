@@ -13,8 +13,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import CreateIcon from '@mui/icons-material/Create';
-import DeleteIcon from '@mui/icons-material/Delete';
+import CreateIcon from "@mui/icons-material/Create";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Typography } from "@mui/material";
 
 import CustomerCard from "@/components/Customer/CustomerCard";
@@ -33,6 +33,7 @@ import {
   processRequest,
   processRequestNonReponse,
   sendMessageAction,
+  getHeaders,
 } from "@/pages/index";
 
 const styles = {
@@ -96,6 +97,7 @@ export default function Customer() {
         urls.push(
           window.fetch(`/api/customer/${key}`, {
             method: "DELETE",
+            headers: getHeaders(),
           })
         );
       }
@@ -127,7 +129,10 @@ export default function Customer() {
 
   function reload() {
     window
-      .fetch(`/api/customer/`)
+      .fetch(`/api/customer`, {
+        method: "GET",
+        headers: getHeaders(),
+      })
       .then((response) =>
         processRequest(
           "error",
@@ -137,8 +142,10 @@ export default function Customer() {
         )
       )
       .then((data) => {
-        setObjList(data);
-        setSortedList(data);
+        if (data) {
+          setObjList(data);
+          setSortedList(data);
+        }
       });
   }
 
@@ -177,7 +184,8 @@ export default function Customer() {
         </Grid>
         <Grid item>
           <Button onClick={handleSort} variant="outlined">
-            Ordenar por nombre ({sortOrder === "asc" ? "ascendente" : "descendente"})
+            Ordenar por nombre (
+            {sortOrder === "asc" ? "ascendente" : "descendente"})
           </Button>
         </Grid>
       </Grid>
@@ -195,7 +203,11 @@ export default function Customer() {
       </Grid>
       <Container sx={styles.container}>
         {sortedList.length == 0 && (
-          <Typography>{searchTerm.length > 0 ? "Ningún cliente coincide con la busqueda" : "Aún no has creado ningún cliente"}</Typography>
+          <Typography>
+            {searchTerm.length > 0
+              ? "Ningún cliente coincide con la busqueda"
+              : "Aún no has creado ningún cliente"}
+          </Typography>
         )}
       </Container>
 

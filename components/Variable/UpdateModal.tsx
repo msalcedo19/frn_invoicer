@@ -8,7 +8,12 @@ import Button from "@mui/material/Button";
 import { Typography } from "@mui/material";
 
 import { useDispatch } from "react-redux";
-import { sendMessageAction, style, processRequestToObj } from "@/pages/index";
+import {
+  sendMessageAction,
+  style,
+  processRequestToObj,
+  getHeaders,
+} from "@/pages/index";
 
 interface Props {
   updateBillTo: TBillTo;
@@ -51,9 +56,7 @@ function UpdateModalVariable(props: Props) {
       window
         .fetch(`/api/billTo/${props.updateBillTo.id}`, {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: getHeaders(true),
           body: JSON.stringify(newBillto),
         })
         .then((response) =>
@@ -76,7 +79,7 @@ function UpdateModalVariable(props: Props) {
               "Se actualizó el destinatario correctamente",
               dispatch
             );
-            props.reloadBillTo()
+            props.reloadBillTo();
           }
         });
     } else

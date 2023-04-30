@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
 import Link from "@mui/material/Link";
 import Toolbar from "@mui/material/Toolbar";
-
+import { userService } from "@/src/user";
 const styles = {
   appBar: {
     backgroundColor: "#212121",
@@ -48,6 +48,9 @@ export default function Navbar() {
           </Button>
           <Button style={styles.navLink}>
             <Link href="/variable">Variables</Link>
+          </Button>
+          <Button style={styles.navLink} onClick={userService.logout}>
+            Log out
           </Button>
         </div>
       </Toolbar>

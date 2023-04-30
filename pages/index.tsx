@@ -6,6 +6,19 @@ import { NextRouter } from "next/router";
 import { Dispatch } from "react";
 import { dataPageAction, MESSAGE_INFO_EVENT } from "@/src/actions/dataPage";
 import { breadcrumbAction, RELOAD_EVENT } from "@/src/actions/breadcrumb";
+import { userService } from "@/src/user";
+
+export const getHeaders = (post: boolean = false) => {
+  const requestHeaders: HeadersInit = new Headers();
+  if (post && userService.userValue && userService.userValue.token) {
+    requestHeaders.set("Content-Type", "application/json");
+    requestHeaders.set("Authorization", userService.userValue.token);
+    return requestHeaders;
+  } else if (userService.userValue && userService.userValue.token) {
+    requestHeaders.set("Authorization", userService.userValue.token);
+    return requestHeaders;
+  } else return requestHeaders;
+};
 
 export const sortByNameAsc = (a: TCustomer, b: TCustomer) =>
   a.name.localeCompare(b.name);
@@ -17,15 +30,21 @@ export const handleBreadCrumb = async (
   dispatch: Dispatch<AnyAction>
 ) => {
   const currentRoute = router.asPath;
-  fetch(`/api/breadcrumbs/`, {
+  fetch(`/api/breadcrumbs`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(true),
     body: JSON.stringify({ current_path: currentRoute }),
   })
     .then((response) => {
-      if (response.status >= 200 || response.status < 400)
+      if (response.status == 401) {
+        sendMessageAction(
+          "info",
+          "La sesión ha caducado, vuelve a ingresar.",
+          dispatch
+        );
+        userService.logout();
+        return [];
+      } else if (response.status >= 200 || response.status < 400)
         return response.json();
     })
     .then((data) => {
@@ -40,7 +59,15 @@ export function processRequest(
   dispatch: Dispatch<AnyAction>,
   response: Response
 ) {
-  if (response.status < 200 || response.status >= 400) {
+  if (response.status == 401) {
+    sendMessageAction(
+      "info",
+      "La sesión ha caducado, vuelve a ingresar.",
+      dispatch
+    );
+    userService.logout();
+    return [];
+  } else if (response.status < 200 || response.status >= 400) {
     sendMessageAction(severity, message, dispatch);
     return [];
   }
@@ -53,7 +80,15 @@ export function processRequestToObj(
   dispatch: Dispatch<AnyAction>,
   response: Response
 ) {
-  if (response.status < 200 || response.status >= 400) {
+  if (response.status == 401) {
+    sendMessageAction(
+      "info",
+      "La sesión ha caducado, vuelve a ingresar.",
+      dispatch
+    );
+    userService.logout();
+    return [];
+  } else if (response.status < 200 || response.status >= 400) {
     sendMessageAction(severity, message, dispatch);
     return undefined;
   }
@@ -66,7 +101,15 @@ export function processRequestNonReponse(
   dispatch: Dispatch<AnyAction>,
   response: Response
 ) {
-  if (response.status < 200 || response.status >= 400) {
+  if (response.status == 401) {
+    sendMessageAction(
+      "info",
+      "La sesión ha caducado, vuelve a ingresar.",
+      dispatch
+    );
+    userService.logout();
+    return [];
+  } else if (response.status < 200 || response.status >= 400) {
     sendMessageAction(severity, message, dispatch);
     return true;
   }
