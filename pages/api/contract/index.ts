@@ -9,26 +9,35 @@ export default async function handler(
   if (req.method === "POST") {
     // Process a POST request
     const postData = async () => {
-      const response = await fetch(`${API_ENDPOINT}/contract/`, {
+      const response = await fetch(`${API_ENDPOINT}/contract`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": req.headers.authorization,
         },
         body: JSON.stringify(req.body),
       });
-      return response.json();
+      return { response: response.json(), status: response.status };
     };
-    const data = await postData()
-    res.status(200).json(data);
+
+    const data = await postData();
+    const json = await data.response;
+    const status_response = await data.status;
+    res.status(status_response).json(json);
   } else {
     // Handle any other HTTP method
     const getData = async () => {
-      const response = await fetch(`${API_ENDPOINT}/contract/`, {
+      const response = await fetch(`${API_ENDPOINT}/contract`, {
         method: "GET",
+        headers: {
+          Authorization: req.headers.authorization,
+        },
       });
-      return response.json();
+      return { response: response.json(), status: response.status };
     };
-    const data = await getData()
-    res.status(200).json(data);
+    const data = await getData();
+    const json = await data.response;
+    const status_response = await data.status;
+    res.status(status_response).json(json);
   }
 }

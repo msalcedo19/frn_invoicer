@@ -38,6 +38,7 @@ import {
   sendMessageAction,
   style,
   processRequestToObj,
+  getHeaders,
 } from "@/pages/index";
 import UpdateModalVariable from "@/components/Variable/UpdateModal";
 import PostModalVariable from "@/components/Variable/PostModal";
@@ -58,6 +59,7 @@ function VariableEditor() {
         urls.push(
           window.fetch(`/api/billTo/${key}`, {
             method: "DELETE",
+            headers: getHeaders(),
           })
         );
       }
@@ -81,7 +83,10 @@ function VariableEditor() {
       if (!failed) {
         sendMessageAction("success", "Se eliminaron correctamente", dispatch);
         window
-          .fetch(`/api/billTo/`)
+          .fetch(`/api/billTo`, {
+            method: "GET",
+            headers: getHeaders(),
+          })
           .then((response) => response.json())
           .then((data) => {
             setBillTos(data);
@@ -133,9 +138,7 @@ function VariableEditor() {
     window
       .fetch(`/api/global/${id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getHeaders(true),
         body: JSON.stringify(updatedGlobal),
       })
       .then((response) =>
@@ -187,9 +190,7 @@ function VariableEditor() {
     window
       .fetch(`/api/topInfo/${id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getHeaders(true),
         body: JSON.stringify(updatedTopInfo),
       })
       .then((response) =>
@@ -225,21 +226,30 @@ function VariableEditor() {
   const dispatch = useDispatch();
   useEffect(() => {
     window
-      .fetch(`/api/global/`)
+      .fetch(`/api/global`, {
+        method: "GET",
+        headers: getHeaders(),
+      })
       .then((response) => response.json())
       .then((data) => {
         sortGlobal(data);
       });
 
     window
-      .fetch(`/api/topInfo/`)
+      .fetch(`/api/topInfo`, {
+        method: "GET",
+        headers: getHeaders(),
+      })
       .then((response) => response.json())
       .then((data) => {
         setTopinfos(data);
       });
 
     window
-      .fetch(`/api/billTo/`)
+      .fetch(`/api/billTo`, {
+        method: "GET",
+        headers: getHeaders(),
+      })
       .then((response) => response.json())
       .then((data) => {
         setBillTos(data);
@@ -263,7 +273,10 @@ function VariableEditor() {
   const handleCloseBillTo = () => setOpenUpdateBillTo(false);
   const reloadBillTo = () => {
     window
-      .fetch(`/api/billTo/`)
+      .fetch(`/api/billTo`, {
+        method: "GET",
+        headers: getHeaders(),
+      })
       .then((response) => response.json())
       .then((data) => {
         setBillTos(data);

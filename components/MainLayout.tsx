@@ -9,13 +9,52 @@ import { RootState } from "@/src/reducers/rootReducer";
 import { useRouter } from "next/router";
 import BasicAlerts from "./MAlert";
 
+import { useEffect, useState } from "react";
+import { userService } from "@/src/user";
+
 const MainLayout: React.FC<Props> = ({ children }) => {
   const router = useRouter();
   const currentRoute = router.pathname;
   const dataPageState = useSelector((state: RootState) => state.dataPage);
+
+  const [user, setUser] = useState(null);
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    // on initial load - run auth check
+    authCheck(router.asPath);
+
+    // on route change start - hide page content by setting authorized to false
+    const hideContent = () => setAuthorized(false);
+
+    // on route change complete - run auth check
+    router.events.on("routeChangeComplete", authCheck);
+
+    // unsubscribe from events in useEffect return function
+    return () => {
+      router.events.off("routeChangeComplete", authCheck);
+    };
+  }, []);
+
+  function authCheck(url: string) {
+    // redirect to login page if accessing a private page and not logged in
+    setUser(userService.userValue);
+    const publicPaths = ["/login"];
+    const path = url.split("?")[0];
+    if (!userService.userValue && !publicPaths.includes(path)) {
+      setAuthorized(false);
+      router.push({
+        pathname: "/login",
+        query: { returnUrl: router.asPath },
+      });
+    } else if (userService.userValue) {
+      setAuthorized(true);
+    }
+  }
+
   return (
     <div>
-      <Navbar />
+      {authorized && <Navbar />}
       {dataPageState.messageInfo.show && (
         <BasicAlerts
           severity={dataPageState.messageInfo.severity}
@@ -23,18 +62,19 @@ const MainLayout: React.FC<Props> = ({ children }) => {
         />
       )}
       <Container maxWidth="lg" component="main" sx={{ marginTop: "2.5%" }}>
-        {currentRoute != "/variable" && currentRoute != "/customer" && currentRoute != "/" && (
-          <BasicBreadcrumbs />
-        )}
+        {authorized &&
+          currentRoute != "/variable" &&
+          currentRoute != "/customer" &&
+          currentRoute != "/" && <BasicBreadcrumbs />}
         <Box sx={{ my: 2 }} />
-        {currentRoute != "/variable" && (
+        {authorized && currentRoute != "/variable" && (
           <Typography variant="h5" component="h2">
             {dataPageState.title}
           </Typography>
         )}
-        <Container sx={{ marginTop: "2.5%" }}>{children}</Container>
+        <Container sx={{ marginTop: "2.5%", padding: "0 !important" }}>{children}</Container>
       </Container>
-      <Footer />
+      {authorized && <Footer />}
     </div>
   );
 };
