@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { API_ENDPOINT } from "config";
+import { getHeadersAPI } from "@/pages/api/utils";
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,10 +17,7 @@ export default async function handler(
     const postData = async () => {
       const response = await fetch(`${API_ENDPOINT}/topinfo/${model_id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": req.headers.authorization,
-        },
+        headers: getHeadersAPI(req),
         body: JSON.stringify(req.body),
       });
       return { response: response.json(), status: response.status };

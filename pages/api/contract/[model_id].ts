@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { API_ENDPOINT } from "config";
+import { getHeadersAPI } from "@/pages/api/utils";
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,15 +10,10 @@ export default async function handler(
   const model_id = req.query.model_id;
   if (req.method === "DELETE") {
     const getData = async () => {
-      const response = await fetch(
-        `${API_ENDPOINT}/contract/${model_id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: req.headers.authorization,
-          },
-        }
-      );
+      const response = await fetch(`${API_ENDPOINT}/contract/${model_id}`, {
+        method: "DELETE",
+        headers: getHeadersAPI(req),
+      });
       return { response: response.json(), status: response.status };
     };
     const data = await getData();
@@ -27,15 +23,10 @@ export default async function handler(
   } else if (req.method == "GET") {
     // Handle any other HTTP method
     const getData = async () => {
-      const response = await fetch(
-        `${API_ENDPOINT}/contract/${model_id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: req.headers.authorization,
-          },
-        }
-      );
+      const response = await fetch(`${API_ENDPOINT}/contract/${model_id}`, {
+        method: "GET",
+        headers: getHeadersAPI(req),
+      });
       return { response: response.json(), status: response.status };
     };
     const data = await getData();
@@ -44,17 +35,11 @@ export default async function handler(
     res.status(status_response).json(json);
   } else {
     const postData = async () => {
-      const response = await fetch(
-        `${API_ENDPOINT}/contract/${model_id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": req.headers.authorization,
-          },
-          body: JSON.stringify(req.body),
-        }
-      );
+      const response = await fetch(`${API_ENDPOINT}/contract/${model_id}`, {
+        method: "PATCH",
+        headers: getHeadersAPI(req),
+        body: JSON.stringify(req.body),
+      });
       return { response: response.json(), status: response.status };
     };
 

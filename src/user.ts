@@ -5,7 +5,10 @@ import { Dispatch } from "react";
 import { AnyAction } from "redux";
 
 const userSubject = new BehaviorSubject(
-  typeof window !== "undefined" && JSON.parse(localStorage.getItem("user"))
+  typeof window !== "undefined" &&
+    (localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user")!)
+      : undefined)
 );
 
 export const userService = {
@@ -56,7 +59,7 @@ async function login(
 
 function logout() {
   // remove user from local storage, publish null to user subscribers and redirect to login page
-  if(userSubject.value){
+  if (userSubject.value) {
     userSubject.next(null);
     localStorage.removeItem("user");
     Router.push("/");
