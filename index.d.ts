@@ -2,7 +2,7 @@ type TCustomer = {
   id: number;
   name: string;
   invoices: TInvoice[];
-  num_invoices;
+  num_invoices: number;
   number;
 };
 
