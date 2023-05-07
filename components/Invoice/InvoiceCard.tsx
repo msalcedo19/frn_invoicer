@@ -153,7 +153,7 @@ export function InvoiceCard({
   const [total_tax_2, setTotalTax2] = useState(0);
   function calculateTotal() {
     let subtotal = 0;
-    invoice.files[0].services.forEach(
+    invoice.files[invoice.files.length - 1].services.forEach(
       (service) => (subtotal += service.amount)
     );
     let a_tax_1 = (invoice.tax_1 / 100) * subtotal;
