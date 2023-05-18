@@ -153,9 +153,10 @@ export function InvoiceCard({
   const [total_tax_2, setTotalTax2] = useState(0);
   function calculateTotal() {
     let subtotal = 0;
-    invoice.files[invoice.files.length - 1].services.forEach(
-      (service) => (subtotal += service.amount)
-    );
+    if (invoice.files.length > 0)
+      invoice.files[invoice.files.length - 1].services.forEach(
+        (service) => (subtotal += service.amount)
+      );
     let a_tax_1 = (invoice.tax_1 / 100) * subtotal;
     let a_tax_2 = (invoice.tax_2 / 100) * subtotal;
     a_tax_1 = parseFloat(a_tax_1.toFixed(2));
