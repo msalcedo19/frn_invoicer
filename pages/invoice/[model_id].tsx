@@ -13,6 +13,7 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CircularProgress from "@mui/material/CircularProgress";
 import { PostInvoiceModal } from "@/components/Invoice/InvoiceModal";
 import Box from "@mui/material/Box";
 
@@ -34,6 +35,7 @@ export default function CustomerDetail() {
   const {
     query: { model_id },
   } = useRouter();
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -99,6 +101,7 @@ export default function CustomerDetail() {
           if (data && data["files"]) {
             setFiles(data["files"].sort(sortByDateAsc));
           }
+          setLoading(false);
         });
   }
 
@@ -128,7 +131,13 @@ export default function CustomerDetail() {
       />
       <Container sx={{ marginTop: "5%" }}>
         <Grid container spacing={5} alignItems="flex-end">
-          {files != undefined &&
+          {loading && (
+            <Box sx={{ width: "100%", textAlign: "center" }}>
+              <CircularProgress />
+            </Box>
+          )}
+          {!loading &&
+            files != undefined &&
             files.length > 0 &&
             files.map((file: TFile) => (
               <FilesRow

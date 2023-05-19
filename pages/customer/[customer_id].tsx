@@ -14,6 +14,7 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
 import { Typography } from "@mui/material";
@@ -59,6 +60,7 @@ const sortByNameDesc = (a: TInvoice, b: TInvoice) =>
 
 export default function CustomerDetail() {
   const [objList, setObjList] = useState<TInvoice[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -152,6 +154,7 @@ export default function CustomerDetail() {
             setObjList(data["invoices"]);
             setSortedList(data["invoices"]);
           }
+          setLoading(false);
         });
     }
   }
@@ -219,7 +222,12 @@ export default function CustomerDetail() {
         ))}
       </Grid>
       <Container sx={styles.container}>
-        {sortedList.length == 0 && (
+        {loading && (
+          <Box sx={{ width: "100%" }}>
+            <CircularProgress />
+          </Box>
+        )}
+        {!loading && sortedList.length == 0 && (
           <Typography>
             {searchTerm.length > 0
               ? "Ninguna factura coincide con la busqueda"

@@ -163,7 +163,7 @@ export function InvoiceCard({
     a_tax_2 = parseFloat(a_tax_2.toFixed(2));
 
     let a_total = a_tax_1 + a_tax_2 + subtotal;
-
+    a_total = parseFloat(a_total.toFixed(2));
     setTotal(a_total);
     setTotalNoTaxes(subtotal);
     setTotalTax1(a_tax_1);

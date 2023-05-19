@@ -15,6 +15,7 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CircularProgress from "@mui/material/CircularProgress";
 import { Typography } from "@mui/material";
 
 import CustomerCard from "@/components/Customer/CustomerCard";
@@ -57,6 +58,7 @@ const styles = {
 
 export default function Customer() {
   const [objList, setObjList] = useState<TCustomer[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -146,6 +148,7 @@ export default function Customer() {
           setObjList(data);
           setSortedList(data);
         }
+        setLoading(false);
       });
   }
 
@@ -202,7 +205,12 @@ export default function Customer() {
         ))}
       </Grid>
       <Container sx={styles.container}>
-        {sortedList.length == 0 && (
+        {loading && (
+          <Box sx={{ width: "100%" }}>
+            <CircularProgress />
+          </Box>
+        )}
+        {!loading && sortedList.length == 0 && (
           <Typography>
             {searchTerm.length > 0
               ? "Ningún cliente coincide con la busqueda"
