@@ -4,16 +4,21 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useDispatch } from "react-redux";
 import { sendMessageAction } from "@/pages/index";
 import { userService } from "@/src/user";
-import Router from "next/router";
 
 const LoginForm = () => {
-  const [username, setUsername] = useState("msalcedo");
-  const [password, setPassword] = useState("msalcedo");
+  const [username, setUsername] = useState<string>();
+  const [password, setPassword] = useState<string>();
 
   const dispatch = useDispatch();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    userService.login(username, password, dispatch);
+    if (username && password) userService.login(username, password, dispatch);
+    else
+      sendMessageAction(
+        "warning",
+        "Rellena todos los campos e intentalo nuevamente",
+        dispatch
+      );
   };
 
   return (

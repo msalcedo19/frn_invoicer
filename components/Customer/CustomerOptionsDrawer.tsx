@@ -1,10 +1,4 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useState,
-  ChangeEvent,
-  Fragment,
-} from "react";
+import React, { Dispatch, SetStateAction, Fragment } from "react";
 import {
   Grid,
   Fab,
@@ -23,18 +17,23 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 
 interface Props {
-  delete_objs_fun: () => void;
+  handleOpenToDelete: () => void;
   deleteOption: boolean;
   setDeleteOption: Dispatch<SetStateAction<boolean>>;
   handleOpen: () => void;
+  editable: boolean;
+  setEditable: Dispatch<SetStateAction<boolean>>;
+  setSelected: Dispatch<SetStateAction<readonly number[]>>;
   textCreateOption: string;
+  textUpdateOption: string;
   textDeleteOption: string;
 }
 
 type Anchor = "bottom";
-export default function OptionsDrawer(props: Props) {
+export default function CustomerOptionsDrawer(props: Props) {
   const [state, setState] = React.useState({
     bottom: false,
   });
@@ -53,10 +52,17 @@ export default function OptionsDrawer(props: Props) {
       setState({ ...state, [anchor]: open });
     };
 
+  function onCloseIcon() {
+    if (!props.editable) {
+      props.setDeleteOption(false);
+      props.setSelected([]);
+    } else props.setEditable(false);
+  }
+
   return (
     <Box sx={{ position: "fixed", bottom: "32px", right: "32px" }}>
       <Fragment key={"bottom"}>
-        {!props.deleteOption && (
+        {!props.deleteOption && !props.editable && (
           <Fab
             color="primary"
             aria-label="add"
@@ -65,23 +71,23 @@ export default function OptionsDrawer(props: Props) {
             <AddIcon />
           </Fab>
         )}
-        {props.deleteOption && (
+        {(props.deleteOption || props.editable) && (
           <Grid container>
             <Grid item>
               <Fab
                 sx={{ backgroundColor: "green" }}
                 aria-label="add"
-                onClick={props.delete_objs_fun}
+                onClick={() =>
+                  !props.editable
+                    ? props.handleOpenToDelete()
+                    : props.setEditable(false)
+                }
               >
                 <CheckIcon />
               </Fab>
             </Grid>
             <Grid item>
-              <Fab
-                color="primary"
-                aria-label="add"
-                onClick={() => props.setDeleteOption(false)}
-              >
+              <Fab color="primary" aria-label="add" onClick={onCloseIcon}>
                 <CloseIcon />
               </Fab>
             </Grid>
@@ -104,6 +110,14 @@ export default function OptionsDrawer(props: Props) {
                     <CreateIcon />
                   </ListItemIcon>
                   <ListItemText primary={props.textCreateOption} />
+                </ListItemButton>
+              </ListItem>
+              <ListItem key={"update_key"} disablePadding>
+                <ListItemButton onClick={() => props.setEditable(true)}>
+                  <ListItemIcon>
+                    <AutoFixHighIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={props.textUpdateOption} />
                 </ListItemButton>
               </ListItem>
               <ListItem key={"delete_key"} disablePadding>

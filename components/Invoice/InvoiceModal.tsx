@@ -117,10 +117,20 @@ export const PostInvoiceModal = ({
           body: JSON.stringify(newInvoice),
         })
         .then((response) => {
-          if (response.status < 200 || response.status >= 400) {
+          if (
+            response.status != 409 &&
+            (response.status < 200 || response.status >= 400)
+          ) {
             sendMessageAction(
               "error",
               "Hubo un error creando la factura, por favor intentelo nuevamente",
+              dispatch
+            );
+            return undefined;
+          } else if (response.status == 409) {
+            sendMessageAction(
+              "error",
+              "Ya existe una factura con ese número de identificación",
               dispatch
             );
             return undefined;
@@ -178,11 +188,6 @@ export const PostInvoiceModal = ({
               });
           } else if (!file || !invoice_response || !invoice_response.id) {
             setError(true);
-            sendMessageAction(
-              "error",
-              "Hubo un error creando la factura, por favor intentelo nuevamente",
-              dispatch
-            );
             setLoading(false);
           }
         });

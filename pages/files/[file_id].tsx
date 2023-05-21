@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import { useEffect, Fragment, useState, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -29,6 +30,7 @@ export default function FileDetail() {
   const {
     query: { file_id },
   } = useRouter();
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [searchTerm, setSearchTerm] = useState("");
   function handleSearch(
@@ -74,6 +76,7 @@ export default function FileDetail() {
             setContracts(data["services"]);
             setSortedList(data["services"]);
           }
+          setLoading(false);
         });
   }
 
@@ -134,7 +137,12 @@ export default function FileDetail() {
           ))}
       </Grid>
       <Container sx={{ mt: "100px", width: "100%", textAlign: "center" }}>
-        {sortedList && sortedList.length == 0 && (
+        {loading && (
+          <Box sx={{ width: "100%" }}>
+            <CircularProgress />
+          </Box>
+        )}
+        {!loading && sortedList && sortedList.length == 0 && (
           <Typography>
             {searchTerm.length > 0
               ? "Ningún contrato coincide con la busqueda"
