@@ -9,13 +9,13 @@ import {
 } from "@/pages/index";
 
 interface Props {
-  customer: TCustomer;
+  invoice: TInvoice;
   isEditable: boolean;
   handleIsEditableClose: () => void;
 }
 
-export default function CustomerEditable(props: Props) {
-  const [editedName, setEditedName] = useState(props.customer.name);
+export default function InvoiceEditable(props: Props) {
+  const [editedName, setEditedName] = useState(props.invoice.number_id.toString());
 
   const handleNameChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -25,22 +25,22 @@ export default function CustomerEditable(props: Props) {
 
   const dispatch = useDispatch();
   const handleNameBlur = () => {
-    if (editedName != props.customer.name) {
-      fetch(`/api/customer/${props.customer.id}`, {
+    if (editedName != props.invoice.number_id.toString()) {
+      fetch(`/api/invoice/${props.invoice.id}`, {
         method: "PATCH",
         headers: getHeaders(true),
-        body: JSON.stringify({ name: editedName }),
+        body: JSON.stringify({ number_id: +editedName }),
       })
         .then((response) =>
           processRequestToObj(
             "error",
-            "Hubo un error actualizando el cliente, por favor intentelo nuevamente",
+            "Hubo un error actualizando la factura, por favor intentelo nuevamente",
             dispatch,
             response
           )
         )
         .then((data) => {
-          if (!data) setEditedName(props.customer.name);
+          if (!data) setEditedName(props.invoice.number_id.toString());
           else
             sendMessageAction(
               "success",
@@ -62,7 +62,6 @@ export default function CustomerEditable(props: Props) {
           autoFocus={true}
           onChange={handleNameChange}
           onBlur={handleNameBlur}
-          
         />
       ) : (
         <Typography>{editedName}</Typography>

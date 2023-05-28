@@ -94,9 +94,15 @@ export function processRequestToObj(
     );
     userService.logout();
     return [];
+  } else if (response.status == 406) {
+    sendMessageAction(
+      "info",
+      "Dato invalido.",
+      dispatch
+    );
+    return undefined
   } else if (response.status < 200 || response.status >= 400) {
     if (userService.userValue) sendMessageAction(severity, message, dispatch);
-    return undefined;
   }
   return response.json();
 }

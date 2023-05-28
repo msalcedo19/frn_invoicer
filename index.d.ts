@@ -20,7 +20,6 @@ type TInvoice = {
   id: number;
   number_id: number;
   reason: string;
-  subtotal: number;
   tax_1: number;
   tax_2: number;
   created: Date;
@@ -49,6 +48,7 @@ type TTopInfo = {
 
 type TGlobal = {
   id: number;
+  identifier: number;
   name: str;
   value: str;
   created: string;

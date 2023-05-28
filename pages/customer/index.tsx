@@ -8,6 +8,7 @@ import {
   TableRow,
   Paper,
   Checkbox,
+  LinearProgress,
 } from "@mui/material";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
@@ -46,6 +47,7 @@ export default function EnhancedTable() {
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -201,7 +203,7 @@ export default function EnhancedTable() {
           setRows(data);
           setRowsBackUp(data);
         }
-        //setLoading(false);
+        setLoading(false);
       });
   }
 
@@ -298,6 +300,7 @@ export default function EnhancedTable() {
                         id={labelId}
                         scope="row"
                         padding="none"
+                        align="left"
                       >
                         <CustomerEditable
                           customer={row}
@@ -305,7 +308,7 @@ export default function EnhancedTable() {
                           handleIsEditableClose={handleIsEditableClose}
                         />
                       </TableCell>
-                      <TableCell align="right">{row.num_invoices}</TableCell>
+                      <TableCell align="center">{row.num_invoices}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -316,6 +319,28 @@ export default function EnhancedTable() {
                     }}
                   >
                     <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+
+                {rows.length == 0 && !loading && (
+                  <TableRow
+                    style={{
+                      height: 53,
+                    }}
+                  >
+                    <TableCell colSpan={7} align="center">
+                      Aún no se ha creado ningún cliente
+                    </TableCell>
+                  </TableRow>
+                )}
+                {rows.length == 0 && loading && (
+                  <TableRow>
+                    <TableCell colSpan={7} sx={{ padding: "0 0 15px 0" }}>
+                      <LinearProgress />
+                      <div style={{ textAlign: "center", marginTop: "15px" }}>
+                        Cargando...
+                      </div>
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

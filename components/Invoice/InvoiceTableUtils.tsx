@@ -19,9 +19,9 @@ import { ChangeEvent } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 
 function descendingComparator<T>(
-  a: TCustomer,
-  b: TCustomer,
-  orderBy: keyof TCustomer
+  a: TInvoice,
+  b: TInvoice,
+  orderBy: string
 ) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -36,8 +36,8 @@ export type Order = "asc" | "desc";
 
 export function getComparator<Key extends keyof any>(
   order: Order,
-  orderBy: keyof TCustomer
-): (a: TCustomer, b: TCustomer) => number {
+  orderBy: string
+): (a: TInvoice, b: TInvoice) => number {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
@@ -48,11 +48,11 @@ export function getComparator<Key extends keyof any>(
 // only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
 // with exampleArray.slice().sort(exampleComparator)
 export function stableSort<T>(
-  array: readonly TCustomer[],
-  comparator: (a: TCustomer, b: TCustomer) => number
+  array: readonly TInvoice[],
+  comparator: (a: TInvoice, b: TInvoice) => number
 ) {
   const stabilizedThis = array.map(
-    (el, index) => [el, index] as [TCustomer, number]
+    (el, index) => [el, index] as [TInvoice, number]
   );
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -66,32 +66,65 @@ export function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof TCustomer;
+  id: string;
   label: string;
   numeric: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
   {
-    id: "name",
-    numeric: false,
+    id: "number_id",
+    numeric: true,
     disablePadding: true,
-    label: "Nombre cliente",
+    label: "Número Factura",
   },
   {
-    id: "num_invoices",
+    id: "total",
     numeric: true,
     disablePadding: false,
-    label: "Facturas",
+    label: "Total",
+  },
+  {
+    id: "subtotal",
+    numeric: true,
+    disablePadding: false,
+    label: "Subtotal",
+  },
+  {
+    id: "tax_1",
+    numeric: true,
+    disablePadding: false,
+    label: "TPS",
+  },
+  {
+    id: "tax_2",
+    numeric: true,
+    disablePadding: false,
+    label: "TVQ",
+  },
+  {
+    id: "last_invoice",
+    numeric: false,
+    disablePadding: false,
+    label: "Factura más reciente",
+  },
+  {
+    id: "created",
+    numeric: false,
+    disablePadding: false,
+    label: "Fecha Creación",
+  },
+  {
+    id: "updated",
+    numeric: false,
+    disablePadding: false,
+    label: "Fecha Última Actualización",
   },
 ];
 
 interface EnhancedTableProps {
   numSelected: number;
-  onRequestSort: (
-    event: React.MouseEvent<unknown>,
-    property: keyof TCustomer
-  ) => void;
+  onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
@@ -109,7 +142,7 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
     onRequestSort,
   } = props;
   const createSortHandler =
-    (property: keyof TCustomer) => (event: React.MouseEvent<unknown>) => {
+    (property: string) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
@@ -133,7 +166,7 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.label == "Nombre cliente" ? "left" : "center"}
+            align="center"
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -142,6 +175,7 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
               direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
               hideSortIcon={true}
+              sx={{ fontWeight: "bold" }}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
@@ -200,7 +234,7 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filtrar por nombre">
+        <Tooltip title="Filtrar por número de factura">
           <TextField
             size="small"
             value={props.searchTerm}
