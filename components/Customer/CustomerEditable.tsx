@@ -11,20 +11,16 @@ import {
 interface Props {
   customer: TCustomer;
   isEditable: boolean;
+  handleIsEditableClose: () => void;
 }
 
 export default function CustomerEditable(props: Props) {
-  const [editable, setEditable] = useState(false);
   const [editedName, setEditedName] = useState(props.customer.name);
 
   const handleNameChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setEditedName(e.target.value);
-  };
-
-  const handleNameClick = () => {
-    setEditable(true);
   };
 
   const dispatch = useDispatch();
@@ -52,13 +48,13 @@ export default function CustomerEditable(props: Props) {
               dispatch
             );
         });
+      props.handleIsEditableClose();
     }
-    setEditable(false);
   };
   return (
     <div>
       {" "}
-      {editable ? (
+      {props.isEditable ? (
         <TextField
           variant="standard"
           fullWidth
@@ -68,9 +64,7 @@ export default function CustomerEditable(props: Props) {
           onBlur={handleNameBlur}
         />
       ) : (
-        <Typography onClick={props.isEditable ? handleNameClick : () => {}}>
-          {editedName}
-        </Typography>
+        <Typography>{editedName}</Typography>
       )}
     </div>
   );

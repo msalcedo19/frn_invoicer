@@ -10,6 +10,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Tooltip,
 } from "@mui/material";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import CreateIcon from "@mui/icons-material/Create";
@@ -74,6 +75,7 @@ export default function CustomerOptionsDrawer(props: Props) {
         {(props.deleteOption || props.editable) && (
           <Grid container>
             <Grid item>
+            <Tooltip title="Eliminar">
               <Fab
                 sx={{ backgroundColor: "green" }}
                 aria-label="add"
@@ -85,6 +87,7 @@ export default function CustomerOptionsDrawer(props: Props) {
               >
                 <CheckIcon />
               </Fab>
+              </Tooltip>
             </Grid>
             <Grid item>
               <Fab color="primary" aria-label="add" onClick={onCloseIcon}>

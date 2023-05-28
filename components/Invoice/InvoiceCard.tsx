@@ -173,7 +173,7 @@ export function InvoiceCard({
   useEffect(() => {
     calculateTotal();
   }, []);
-
+  console.log(invoice.files[0].s3_pdf_url);
   return (
     <Grid item xs={12} sm={6} md={4} sx={{ mb: 2 }}>
       <Card

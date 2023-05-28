@@ -129,6 +129,7 @@ export default function EnhancedTable() {
   const handleClose = () => setOpen(false);
 
   const [isEditable, setIsEditable] = useState(false);
+  const handleIsEditableClose = () => setIsEditable(false);
 
   const [openToDelete, setOpenToDelete] = useState(false);
   const handleOpenToDelete = () => setOpenToDelete(true);
@@ -301,6 +302,7 @@ export default function EnhancedTable() {
                         <CustomerEditable
                           customer={row}
                           isEditable={isEditable}
+                          handleIsEditableClose={handleIsEditableClose}
                         />
                       </TableCell>
                       <TableCell align="right">{row.num_invoices}</TableCell>

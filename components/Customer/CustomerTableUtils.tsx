@@ -11,10 +11,12 @@ import {
   IconButton,
   Tooltip,
   TextField,
+  InputAdornment,
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ChangeEvent } from "react";
+import SearchIcon from "@mui/icons-material/Search";
 
 function descendingComparator<T>(
   a: TCustomer,
@@ -197,12 +199,18 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
+        <Tooltip title="Filtrar por nombre">
           <TextField
             size="small"
-            label="Buscar por nombre"
             value={props.searchTerm}
             onChange={props.handleSearch}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
           />
         </Tooltip>
       )}
