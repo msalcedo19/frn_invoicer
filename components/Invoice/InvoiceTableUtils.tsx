@@ -21,7 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 function descendingComparator<T>(
   a: TInvoice,
   b: TInvoice,
-  orderBy: string
+  orderBy: keyof TInvoice
 ) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -36,7 +36,7 @@ export type Order = "asc" | "desc";
 
 export function getComparator<Key extends keyof any>(
   order: Order,
-  orderBy: string
+  orderBy: keyof TInvoice
 ): (a: TInvoice, b: TInvoice) => number {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
@@ -66,7 +66,7 @@ export function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: string;
+  id: keyof TInvoice;
   label: string;
   numeric: boolean;
 }
@@ -124,7 +124,7 @@ const headCells: readonly HeadCell[] = [
 
 interface EnhancedTableProps {
   numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
+  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof TInvoice) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
@@ -142,7 +142,7 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
     onRequestSort,
   } = props;
   const createSortHandler =
-    (property: string) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof TInvoice) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 

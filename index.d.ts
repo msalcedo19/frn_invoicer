@@ -26,6 +26,10 @@ type TInvoice = {
   updated: Date;
   customer_id: number;
   files: TFile[];
+
+  total: string;
+  subtotal: string;
+  last_invoice: string;
 };
 
 type TFile = {

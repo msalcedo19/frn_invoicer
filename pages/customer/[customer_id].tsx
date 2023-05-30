@@ -48,7 +48,7 @@ export default function EnhancedTable() {
   const [rows, setRows] = useState<TInvoice[]>([]);
   const [rowsBackUp, setRowsBackUp] = useState<TInvoice[]>([]);
   const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<string>("number_id");
+  const [orderBy, setOrderBy] = React.useState<keyof TInvoice>("number_id");
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -59,7 +59,7 @@ export default function EnhancedTable() {
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: string
+    property: keyof TInvoice
   ) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
