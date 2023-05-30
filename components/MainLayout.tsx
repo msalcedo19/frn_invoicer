@@ -61,7 +61,8 @@ const MainLayout: React.FC<Props> = ({ children }) => {
           message={dataPageState.messageInfo.message}
         />
       )}
-      <Container maxWidth="lg" component="main" sx={{ marginTop: "2.5%" }}>
+
+      <Container maxWidth="xl" component="main" sx={{ marginTop: "2.5%" }}>
         {authorized &&
           currentRoute != "/variable" &&
           currentRoute != "/customer" &&
@@ -72,7 +73,15 @@ const MainLayout: React.FC<Props> = ({ children }) => {
             {dataPageState.title}
           </Typography>
         )}
-        <Container sx={{ marginTop: "2.5%", padding: "0 !important" }}>{children}</Container>
+        <Container
+          sx={{
+            marginTop: "2.5%",
+            padding: "0 !important",
+            maxWidth: "none !important",
+          }}
+        >
+          {children}
+        </Container>
       </Container>
       {authorized && <Footer />}
     </div>

@@ -2,7 +2,7 @@ type TCustomer = {
   id: number;
   name: string;
   invoices: TInvoice[];
-  num_invoices;
+  num_invoices: number;
   number;
 };
 
@@ -20,13 +20,16 @@ type TInvoice = {
   id: number;
   number_id: number;
   reason: string;
-  subtotal: number;
   tax_1: number;
   tax_2: number;
   created: Date;
   updated: Date;
   customer_id: number;
   files: TFile[];
+
+  total: string;
+  subtotal: string;
+  last_invoice: string;
 };
 
 type TFile = {
@@ -49,6 +52,7 @@ type TTopInfo = {
 
 type TGlobal = {
   id: number;
+  identifier: number;
   name: str;
   value: str;
   created: string;
