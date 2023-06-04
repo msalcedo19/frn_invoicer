@@ -130,9 +130,6 @@ export default function FileDetail() {
             <ContractCard
               key={contract.id}
               contract={contract}
-              checkedList={undefined}
-              setCheckedList={undefined}
-              deleteOp={false}
             />
           ))}
       </Grid>

@@ -111,7 +111,11 @@ function VariableEditor() {
     );
     return `${formattedDate
       .toISOString()
-      .slice(0, 10)} ${formattedDate.getHours()}:${formattedDate.getMinutes()}`;
+      .slice(0, 10)} ${formattedDate.getHours()}:${
+      formattedDate.getMinutes() > 9
+        ? formattedDate.getMinutes()
+        : "0" + formattedDate.getMinutes()
+    }`;
   }
 
   const handleVariableChange = (
