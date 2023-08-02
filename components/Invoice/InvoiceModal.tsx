@@ -332,6 +332,7 @@ export const PostInvoiceModal = ({
                 billTos={billTos}
                 billTo={billTo}
                 setChooseBillTo={setChooseBillTo}
+                disabled={false}
               />
             </Grid>
 
@@ -408,6 +409,7 @@ export const PostInvoiceModal = ({
         <CustomTabPanel value={value} index={1}>
           <InvoiceTabModal
             customer_id={customer_id}
+            model_id={undefined}
             create_new_invoice={create_new_invoice}
             open={open}
             handleClose={handleClose}

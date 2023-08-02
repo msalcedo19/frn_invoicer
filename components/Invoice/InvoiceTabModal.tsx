@@ -157,6 +157,8 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
         amount: contractAmount,
         currency: "CAD",
         hours: contractHours,
+        price_unit: undefined,
+        invoice_id: undefined,
       };
       setContracts((prevContracts) => [...prevContracts, newContract]);
       setContractTitle("");
@@ -241,7 +243,7 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
           label="Monto"
           fullWidth
           value={contractAmount}
-          onChange={(e) => setContractAmount(e.target.value)}
+          onChange={(e) => setContractAmount(parseInt(e.target.value))}
         />
       </Grid>
 
@@ -251,7 +253,7 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
           type="number"
           fullWidth
           value={contractHours}
-          onChange={(e) => setContractHours(e.target.value)}
+          onChange={(e) => setContractHours(parseInt(e.target.value))}
         />
       </Grid>
 
