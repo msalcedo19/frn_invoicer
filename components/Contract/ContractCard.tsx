@@ -1,24 +1,9 @@
-import Button from "@mui/material/Button";
-import CardActions from "@mui/material/CardActions";
-import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import Link from "next/link";
 import { Card, CardContent, Typography } from "@mui/material";
 import {
-  Dispatch,
-  SetStateAction,
   useState,
-  ChangeEvent,
   CSSProperties,
 } from "react";
-
-import { useDispatch } from "react-redux";
-import {
-  processRequestToObj,
-  sendMessageAction,
-  getHeaders,
-} from "@/pages/index";
 
 const styles = {
   card: {
@@ -62,7 +47,7 @@ export default function ContractCard({ contract }: { contract: TContract }) {
             {editedName}
           </Typography>
           <Typography style={styles.subtitle} variant="subtitle1" component="p">
-            Precio x hora: ${contract.price_unit}
+            Precio x hora: ${contract.price_unit != 0 ? contract.price_unit : contract.hours != 0 ? parseFloat((contract.amount/contract.hours).toFixed(2)) : 0}
           </Typography>
           <Typography style={styles.subtitle} variant="subtitle1" component="p">
             Total horas: {contract.hours}

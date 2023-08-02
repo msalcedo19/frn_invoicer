@@ -2,7 +2,7 @@ import Button from "@mui/material/Button";
 import ButtonBase from "@mui/material/ButtonBase";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import Link from "@mui/material/Link";
 import Checkbox from "@mui/material/Checkbox";
 
@@ -88,18 +88,34 @@ export default function FilesRow(props: FilesRowProps) {
           </Button>
         </Grid>
         <Grid item xs={5} sx={{ padding: "0px !important" }}>
-          <Link target="_blank" href={props.file.s3_xlsx_url}>
-            <Grid container>
-              <Grid item xs={12}>
-                <ButtonBase sx={iconButtonStyles}>
-                  <BackupTableIcon sx={{ fontSize: 64 }} />
-                </ButtonBase>
+          {props.file.s3_xlsx_url ? (
+            <Link target="_blank" href={props.file.s3_xlsx_url}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <ButtonBase sx={iconButtonStyles}>
+                    <BackupTableIcon sx={{ fontSize: 64 }} />
+                  </ButtonBase>
+                </Grid>
+                <Grid item xs={12} sx={{ textAlign: "center" }}>
+                  <Typography variant="subtitle1">Descargar</Typography>
+                </Grid>
               </Grid>
-              <Grid item xs={12} sx={{ textAlign: "center" }}>
-                <Typography variant="subtitle1">Descargar</Typography>
-              </Grid>
-            </Grid>
-          </Link>
+            </Link>
+          ) : (
+            <Box
+              sx={{
+                m: 2,
+                border: 1,
+                borderColor: "error.main",
+                padding: 1,
+                width: "50%",
+              }}
+            >
+              <Typography variant="h6" color="error">
+                Excel no disponible
+              </Typography>
+            </Box>
+          )}
         </Grid>
         <Grid item xs={1}>
           {props.deleteOp && (
