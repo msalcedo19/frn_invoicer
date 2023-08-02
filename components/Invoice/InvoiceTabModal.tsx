@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -14,14 +14,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import InvoiceModalBillTo from "@/components/Invoice/InvoiceModalBillTo";
 import {
-  processRequestToObj,
   sendMessageAction,
   style,
   getHeaders,
-  processRequest,
 } from "@/pages/index";
 import { useDispatch } from "react-redux";
-import { userService } from "@/src/user";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
@@ -147,23 +144,23 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
 
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [contractTitle, setContractTitle] = useState("");
-  const [contractAmount, setContractAmount] = useState(0);
-  const [contractHours, setContractHours] = useState(0);
+  const [contractAmount, setContractAmount] = useState("0");
+  const [contractHours, setContractHours] = useState("0");
 
   function addContract() {
-    if (contractTitle.length > 0 && contractAmount > 0) {
+    if (contractTitle.length > 0 && parseFloat(contractAmount) > 0) {
       let newContract: Contract = {
         title: contractTitle,
-        amount: contractAmount,
+        amount: parseFloat(contractAmount),
         currency: "CAD",
-        hours: contractHours,
+        hours: parseFloat(contractHours),
         price_unit: undefined,
         invoice_id: undefined,
       };
       setContracts((prevContracts) => [...prevContracts, newContract]);
       setContractTitle("");
-      setContractAmount(0);
-      setContractHours(0);
+      setContractAmount("0");
+      setContractHours("0");
     } else
       sendMessageAction("warning", "Falta rellenar algunos campos", dispatch);
   }
@@ -239,21 +236,19 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
       <Grid item xs={6}>
         <TextField
           required
-          type="number"
           label="Monto"
           fullWidth
           value={contractAmount}
-          onChange={(e) => setContractAmount(parseInt(e.target.value))}
+          onChange={(e) => setContractAmount(e.target.value)}
         />
       </Grid>
-
       <Grid item xs={6}>
         <TextField
+          required
           label="Número de horas"
-          type="number"
           fullWidth
           value={contractHours}
-          onChange={(e) => setContractHours(parseInt(e.target.value))}
+          onChange={(e) => setContractHours(e.target.value)}
         />
       </Grid>
 
