@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Grid, Modal, Typography } from "@mui/material";
+import { Box, Button, Grid, Modal, Typography, Tabs, Tab, FormGroup, Checkbox, FormControlLabel } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 
@@ -13,6 +13,7 @@ import {
 } from "@/pages/index";
 import { useDispatch } from "react-redux";
 import { userService } from "@/src/user";
+import { InvoiceTabModal } from "./InvoiceTabModal";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
@@ -21,6 +22,32 @@ interface PostFileModalProps {
   open: boolean;
   handleClose: () => void;
   reload: () => void;
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
 }
 
 export const PostInvoiceModal = ({
@@ -42,6 +69,8 @@ export const PostInvoiceModal = ({
 
   const [billTos, setBillTos] = useState<TBillTo[]>([]);
   const [billTo, setChooseBillTo] = useState<TBillTo>();
+
+  const [with_taxes, setWith_taxes] = useState<boolean>(true);
 
   const uploadToClient = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -144,6 +173,7 @@ export const PostInvoiceModal = ({
             info_data.append("invoice_id", invoice_response.id.toString());
             info_data.append("bill_to_id", billTo.id.toString());
             info_data.append("file", file);
+            info_data.append("with_taxes", with_taxes.toString());
             const requestHeaders: HeadersInit = new Headers();
             requestHeaders.set("Authorization", userService.userValue.token);
             window
@@ -161,7 +191,6 @@ export const PostInvoiceModal = ({
                 )
               )
               .then((data: TFile) => {
-                console.log(data);
                 if (data && data.id) {
                   reload();
                   handleClose();
@@ -198,6 +227,7 @@ export const PostInvoiceModal = ({
       info_data.append("invoice_id", model_id.toString());
       info_data.append("bill_to_id", billTo.id.toString());
       info_data.append("file", file);
+      info_data.append("with_taxes", with_taxes.toString());
       const requestHeaders: HeadersInit = new Headers();
       requestHeaders.set("Authorization", userService.userValue.token);
       window
@@ -239,6 +269,18 @@ export const PostInvoiceModal = ({
   };
 
   style.width = 500;
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  function a11yProps(index: number) {
+    return {
+      id: `simple-tab-${index}`,
+      "aria-controls": `simple-tabpanel-${index}`,
+    };
+  }
 
   return (
     <Modal
@@ -251,96 +293,130 @@ export const PostInvoiceModal = ({
         <Typography variant="h6" align="center" className="post-title">
           Generar factura
         </Typography>
-        <Grid container spacing={2}>
-          {customer_id && (
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            variant="fullWidth"
+            value={value}
+            onChange={handleChange}
+            aria-label="tabs"
+          >
+            <Tab label="Subir Archivo" {...a11yProps(0)} />
+            <Tab label="Generar" {...a11yProps(1)} />
+          </Tabs>
+        </Box>
+        <CustomTabPanel value={value} index={0}>
+          <Grid container spacing={2}>
+            {customer_id && (
+              <Grid item xs={12}>
+                <TextField
+                  label="ID factura"
+                  fullWidth
+                  value={invoice_id}
+                  onChange={handleSetInvoiceId}
+                  helperText="Número factura"
+                />
+              </Grid>
+            )}
+            {customer_id && (
+              <Grid item xs={12}>
+                <TextField
+                  label="Reason"
+                  fullWidth
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                />
+              </Grid>
+            )}
             <Grid item xs={12}>
-              <TextField
-                label="ID factura"
-                fullWidth
-                value={invoice_id}
-                onChange={handleSetInvoiceId}
-                helperText="Número factura"
+              <InvoiceModalBillTo
+                billTos={billTos}
+                billTo={billTo}
+                setChooseBillTo={setChooseBillTo}
               />
             </Grid>
-          )}
-          {customer_id && (
-            <Grid item xs={12}>
-              <TextField
-                label="Reason"
-                fullWidth
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-              />
+
+            <Grid item xs={12} sx={{ }}>
+              <FormGroup>
+                <FormControlLabel
+                  control={<Checkbox checked={with_taxes} onChange={(e) => setWith_taxes(e.target.checked)}/>}
+                  label="Incluir impuestos?"
+                />
+              </FormGroup>
             </Grid>
-          )}
-          <Grid item xs={12}>
-            <InvoiceModalBillTo
-              billTos={billTos}
-              billTo={billTo}
-              setChooseBillTo={setChooseBillTo}
-            />
-          </Grid>
 
-          <Grid item xs={12}>
-            <hr />
-          </Grid>
+            <Grid item xs={12}>
+              <hr />
+            </Grid>
 
-          <Grid item xs={6}>
-            <Button
-              variant="contained"
-              component="label"
-              fullWidth
-              sx={{
-                height: "100%",
-                backgroundColor: file ? "green" : "primary",
-              }}
-            >
-              Subir archivo
-              <input
-                hidden
-                type="file"
-                name="myFile"
-                onChange={uploadToClient}
-              />
-            </Button>
-          </Grid>
-          <Grid item xs={6}>
-            <Button
-              variant="contained"
-              onClick={postFile}
-              fullWidth
-              disabled={!file}
-              sx={{ height: "100%" }}
-            >
-              Procesar archivo
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
-            {file && (
-              <Typography sx={{ fontStyle: "italic", color: "gray" }}>
-                Archivo seleccionado: {file.name}
-              </Typography>
-            )}
-          </Grid>
-          <Grid item xs={12}>
-            {error && (
-              <Typography color="error">
-                Hubo un error procesando el archivo. Por favor, intenta de
-                nuevo.
-              </Typography>
-            )}
-          </Grid>
-          <Grid item xs={12} sx={{ textAlign: "center" }}>
-            {loading && (
-              <Box display="flex" flexDirection="column" alignItems="center">
-                <CircularProgress />
-                <Typography variant="body1" mt={1}>
-                  Subiendo...
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                component="label"
+                fullWidth
+                sx={{
+                  height: "100%",
+                  backgroundColor: file ? "green" : "primary",
+                }}
+              >
+                Subir archivo
+                <input
+                  hidden
+                  type="file"
+                  name="myFile"
+                  onChange={uploadToClient}
+                />
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                onClick={postFile}
+                fullWidth
+                disabled={!file}
+                sx={{ height: "100%" }}
+              >
+                Procesar archivo
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              {file && (
+                <Typography sx={{ fontStyle: "italic", color: "gray" }}>
+                  Archivo seleccionado: {file.name}
                 </Typography>
-              </Box>
-            )}
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              {error && (
+                <Typography color="error">
+                  Hubo un error procesando el archivo. Por favor, intenta de
+                  nuevo.
+                </Typography>
+              )}
+            </Grid>
+            <Grid item xs={12} sx={{ textAlign: "center" }}>
+              {loading && (
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <CircularProgress />
+                  <Typography variant="body1" mt={1}>
+                    Subiendo...
+                  </Typography>
+                </Box>
+              )}
+            </Grid>
           </Grid>
-        </Grid>
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <InvoiceTabModal
+            customer_id={customer_id}
+            create_new_invoice={create_new_invoice}
+            open={open}
+            handleClose={handleClose}
+            reload={reload}
+            tax_1={tax_1}
+            tax_2={tax_2}
+            billTos={billTos}
+          />
+        </CustomTabPanel>
       </Box>
     </Modal>
   );

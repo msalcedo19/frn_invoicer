@@ -11,6 +11,7 @@ interface ModalBillToProps {
   billTos: TBillTo[];
   billTo: TBillTo | undefined;
   setChooseBillTo: Dispatch<React.SetStateAction<TBillTo | undefined>>;
+  disabled: boolean;
 }
 
 export default function InvoiceModalBillTo(props: ModalBillToProps) {
@@ -31,6 +32,7 @@ export default function InvoiceModalBillTo(props: ModalBillToProps) {
           value={props.billTo ? props.billTo.id.toString(): ""}
           label="Age"
           onChange={handleChange}
+          disabled={props.disabled}
         >
           {props.billTos.map((billTo) => (
             <MenuItem key={billTo.id} value={billTo.id.toString()}>
