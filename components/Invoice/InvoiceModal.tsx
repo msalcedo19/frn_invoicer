@@ -18,6 +18,7 @@ import { InvoiceTabModal } from "./InvoiceTabModal";
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
   customer_id: string | string[] | undefined;
+  number_id: string | string[] | undefined;
   create_new_invoice: boolean;
   open: boolean;
   handleClose: () => void;
@@ -53,6 +54,7 @@ function CustomTabPanel(props: TabPanelProps) {
 export const PostInvoiceModal = ({
   model_id,
   customer_id,
+  number_id,
   create_new_invoice,
   open,
   handleClose,
@@ -306,7 +308,7 @@ export const PostInvoiceModal = ({
         </Box>
         <CustomTabPanel value={value} index={0}>
           <Grid container spacing={2}>
-            {customer_id && (
+            {!model_id && (
               <Grid item xs={12}>
                 <TextField
                   label="ID factura"
@@ -317,7 +319,7 @@ export const PostInvoiceModal = ({
                 />
               </Grid>
             )}
-            {customer_id && (
+            {!model_id && (
               <Grid item xs={12}>
                 <TextField
                   label="Reason"
@@ -354,6 +356,7 @@ export const PostInvoiceModal = ({
                 variant="contained"
                 component="label"
                 fullWidth
+                disabled={file != undefined}
                 sx={{
                   height: "100%",
                   backgroundColor: file ? "green" : "primary",
@@ -373,7 +376,7 @@ export const PostInvoiceModal = ({
                 variant="contained"
                 onClick={postFile}
                 fullWidth
-                disabled={!file}
+                disabled={!file || loading}
                 sx={{ height: "100%" }}
               >
                 Procesar archivo
@@ -409,8 +412,8 @@ export const PostInvoiceModal = ({
         <CustomTabPanel value={value} index={1}>
           <InvoiceTabModal
             customer_id={customer_id}
-            model_id={undefined}
-            create_new_invoice={create_new_invoice}
+            model_id={model_id}
+            number_id={number_id}
             open={open}
             handleClose={handleClose}
             reload={reload}

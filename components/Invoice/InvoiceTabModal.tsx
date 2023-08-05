@@ -13,17 +13,13 @@ import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import InvoiceModalBillTo from "@/components/Invoice/InvoiceModalBillTo";
-import {
-  sendMessageAction,
-  style,
-  getHeaders,
-} from "@/pages/index";
+import { sendMessageAction, style, getHeaders } from "@/pages/index";
 import { useDispatch } from "react-redux";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
   customer_id: string | string[] | undefined;
-  create_new_invoice: boolean;
+  number_id: string | string[] | undefined;
   open: boolean;
   handleClose: () => void;
   reload: () => void;
@@ -44,7 +40,7 @@ interface Contract {
 export const InvoiceTabModal = (props: PostFileModalProps) => {
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [invoice_id, setInvoiceId] = useState("");
+  const [invoice_number_id, setInvoiceId] = useState("");
   const [reason, setReason] = useState("Cleaning Services");
 
   const [billTo, setChooseBillTo] = useState<TBillTo>();
@@ -53,17 +49,15 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
 
   const dispatch = useDispatch();
   function postFile() {
-    if (
-      props.create_new_invoice &&
-      props.customer_id &&
-      invoice_id &&
-      billTo &&
-      !loading
-    ) {
+    if (props.customer_id && (invoice_number_id || props.number_id) && billTo && !loading) {
       setLoading(true);
 
+      if (props.number_id) {
+        let new_invoice_number_id: string = props.number_id.toString()
+        setInvoiceId(new_invoice_number_id);
+      }
       let newInvoice = {
-        number_id: +invoice_id,
+        number_id: +invoice_number_id,
         reason: reason,
         subtotal: 0,
         tax_1: props.tax_1 ? +props.tax_1.value : undefined,
@@ -93,7 +87,7 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
             contracts: contracts_data,
             bill_to_id: billTo.id,
             use_existing_invoice: useExistingInvoice,
-            with_taxes: with_taxes
+            with_taxes: with_taxes,
           }),
         })
         .then((response) => {
@@ -177,13 +171,13 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
 
   return (
     <Grid container spacing={2}>
-      {props.customer_id && (
+      {!props.model_id && (
         <Grid item xs={12}>
           <TextField
             label="ID factura"
             fullWidth
             type="number"
-            value={invoice_id}
+            value={invoice_number_id}
             onChange={handleSetInvoiceId}
             helperText="Número factura"
             disabled={contracts.length > 0 ? true : false}
@@ -194,13 +188,18 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
         <Grid item xs={12} sx={{ paddingTop: "0px !important" }}>
           <FormGroup>
             <FormControlLabel
-              control={<Checkbox checked={useExistingInvoice} onChange={(e) => setUseExistingInvoice(e.target.checked)}/>}
+              control={
+                <Checkbox
+                  checked={useExistingInvoice}
+                  onChange={(e) => setUseExistingInvoice(e.target.checked)}
+                />
+              }
               label="Usar factura existente"
             />
           </FormGroup>
         </Grid>
       )}
-      {props.customer_id && (
+      {!props.model_id && (
         <Grid item xs={12}>
           <TextField
             label="Reason"
@@ -252,14 +251,19 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
         />
       </Grid>
 
-      <Grid item xs={12} sx={{ }}>
-          <FormGroup>
-            <FormControlLabel
-              control={<Checkbox checked={with_taxes} onChange={(e) => setWith_taxes(e.target.checked)}/>}
-              label="Incluir impuestos?"
-            />
-          </FormGroup>
-        </Grid>
+      <Grid item xs={12} sx={{}}>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={with_taxes}
+                onChange={(e) => setWith_taxes(e.target.checked)}
+              />
+            }
+            label="Incluir impuestos?"
+          />
+        </FormGroup>
+      </Grid>
 
       <Grid item xs={12}>
         {contracts.map((contract, index) => (
@@ -297,7 +301,7 @@ export const InvoiceTabModal = (props: PostFileModalProps) => {
           variant="contained"
           onClick={postFile}
           fullWidth
-          disabled={contracts.length == 0}
+          disabled={contracts.length == 0 || loading}
           sx={{ height: "100%" }}
         >
           Finalizar

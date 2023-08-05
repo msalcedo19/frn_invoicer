@@ -33,7 +33,7 @@ const sortByDateAsc = (a: TFile, b: TFile) =>
 export default function CustomerDetail() {
   const [files, setFiles] = useState<TFile[]>([]);
   const {
-    query: { model_id },
+    query: { model_id, customer_id, number_id },
   } = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -123,7 +123,8 @@ export default function CustomerDetail() {
     <Fragment>
       <PostInvoiceModal
         model_id={model_id}
-        customer_id={undefined}
+        customer_id={customer_id}
+        number_id={number_id}
         create_new_invoice={false}
         open={open}
         handleClose={handleClose}

@@ -30,10 +30,12 @@ export const handleBreadCrumb = async (
   dispatch: Dispatch<AnyAction>
 ) => {
   const currentRoute = router.asPath;
+  let auxList = currentRoute.split("?")
+  let cleanCurrentRoute = auxList.length > 0 ? auxList[0] : currentRoute
   fetch(`/api/breadcrumbs`, {
     method: "POST",
     headers: getHeaders(true),
-    body: JSON.stringify({ current_path: currentRoute }),
+    body: JSON.stringify({ current_path: cleanCurrentRoute }),
   })
     .then((response) => {
       if (response.status == 401) {

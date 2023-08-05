@@ -159,7 +159,7 @@ export default function EnhancedTable() {
     }
 
     selected.forEach((value: number, key: number, map: readonly number[]) => {
-      console.log(`${value} ${key} ${map}`);
+      //console.log(`${value} ${key} ${map}`);
       urls.push(
         window.fetch(`/api/invoice/${value}`, {
           method: "DELETE",
@@ -281,6 +281,7 @@ export default function EnhancedTable() {
       <PostInvoiceModal
         model_id={undefined}
         customer_id={customer_id}
+        number_id={undefined}
         create_new_invoice={true}
         open={open}
         handleClose={handleClose}
@@ -327,7 +328,11 @@ export default function EnhancedTable() {
                     <TableRow
                       hover
                       onClick={() =>
-                        !isEditable && router.push(`/invoice/${row.id}`)
+                        !isEditable &&
+                        router.push({
+                          pathname: `/invoice/${row.id}`,
+                          query: { customer_id: customer_id, number_id: row.number_id},
+                        })
                       }
                       role="checkbox"
                       aria-checked={isItemSelected}
