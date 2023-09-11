@@ -1,6 +1,20 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Grid, Modal, Typography, Tabs, Tab, FormGroup, Checkbox, FormControlLabel } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Modal,
+  Typography,
+  Tabs,
+  Tab,
+  FormGroup,
+  Checkbox,
+  FormControlLabel,
+  Chip,
+} from "@mui/material";
 import TextField from "@mui/material/TextField";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import InvoiceModalBillTo from "@/components/Invoice/InvoiceModalBillTo";
@@ -13,7 +27,8 @@ import {
 } from "@/pages/index";
 import { useDispatch } from "react-redux";
 import { userService } from "@/src/user";
-import { InvoiceTabModal } from "./InvoiceTabModal";
+import { Contract, ContractSectionPanel } from "./InvoiceTabModal";
+import SeparatorWithText from "../Utils";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
@@ -127,6 +142,19 @@ export const PostInvoiceModal = ({
 
   const dispatch = useDispatch();
   function postFile() {
+    let contracts_data: Contract[] = [];
+    contracts.forEach((contract_info) => {
+      let contract_data: Contract = {
+        title: contract_info.title,
+        amount: contract_info.amount,
+        currency: contract_info.currency,
+        hours: contract_info.hours,
+        price_unit: 0,
+        invoice_id: undefined,
+      };
+      contracts_data.push(contract_data);
+    });
+
     if (create_new_invoice && customer_id && invoice_id && billTo && !loading) {
       setLoading(true);
 
@@ -136,16 +164,27 @@ export const PostInvoiceModal = ({
         subtotal: 0,
         tax_1: tax_1 ? +tax_1.value : undefined,
         tax_2: tax_2 ? +tax_2.value : undefined,
+        with_taxes: with_taxes,
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
         customer_id: customer_id,
       };
 
+      let info_data = new FormData();
+      info_data.append("bill_to_id", billTo.id.toString());
+      info_data.append("invoice", JSON.stringify(newInvoice));
+      info_data.append("contracts", JSON.stringify(contracts_data));
+      info_data.append("pages", JSON.stringify(chosenPages));
+      if (file != undefined) info_data.append("file", file);
+      info_data.append("with_taxes", with_taxes.toString());
+      const requestHeaders: HeadersInit = new Headers();
+      requestHeaders.set("Authorization", userService.userValue.token);
+
       window
-        .fetch(`/api/invoice/`, {
+        .fetch(`/api/file_manage/`, {
           method: "POST",
-          headers: getHeaders(true),
-          body: JSON.stringify(newInvoice),
+          headers: requestHeaders,
+          body: info_data,
         })
         .then((response) => {
           if (
@@ -168,67 +207,38 @@ export const PostInvoiceModal = ({
           }
           return response.json();
         })
-        .then((invoice_response: TInvoice) => {
-          if (file && invoice_response && invoice_response.id) {
-            let info_data = new FormData();
-            model_id = invoice_response.id.toString();
-            info_data.append("invoice_id", invoice_response.id.toString());
-            info_data.append("bill_to_id", billTo.id.toString());
-            info_data.append("file", file);
-            info_data.append("with_taxes", with_taxes.toString());
-            const requestHeaders: HeadersInit = new Headers();
-            requestHeaders.set("Authorization", userService.userValue.token);
-            window
-              .fetch(`/api/file_manage/`, {
-                method: "POST",
-                headers: requestHeaders,
-                body: info_data,
-              })
-              .then((response) =>
-                processRequestToObj(
-                  "error",
-                  "Hubo un error creando la factura, por favor intentelo nuevamente",
-                  dispatch,
-                  response
-                )
-              )
-              .then((data: TFile) => {
-                if (data && data.id) {
-                  reload();
-                  handleClose();
-                  setInvoiceId("");
-                  sendMessageAction(
-                    "success",
-                    "Se creó la factura correctamente",
-                    dispatch
-                  );
-
-                  setFile(undefined);
-                } else {
-                  window.fetch(`/api/invoice/${invoice_response.id}`, {
-                    method: "DELETE",
-                    headers: getHeaders(),
-                  });
-                  sendMessageAction(
-                    "error",
-                    "Hubo un error creando la factura, por favor intentelo nuevamente",
-                    dispatch
-                  );
-                }
-                setLoading(false);
-              });
-          } else if (!file || !invoice_response || !invoice_response.id) {
-            setError(true);
-            setLoading(false);
+        .then((data: TFile) => {
+          if (data && data.id) {
+            reload();
+            handleClose();
+            setInvoiceId("");
+            setContracts([]);
+            setFile(undefined);
+            setChooseBillTo(undefined);
+            setChosenPages([]);
+            setPages([])
+            sendMessageAction(
+              "success",
+              "Se creó la factura correctamente",
+              dispatch
+            );
           }
+          setLoading(false);
         });
-    } else if (file && model_id && billTo && !loading) {
+    } else if (model_id && billTo && !loading) {
       setLoading(true);
 
       let info_data = new FormData();
-      info_data.append("invoice_id", model_id.toString());
+      if (number_id)
+        info_data.append("invoice_number_id", number_id.toString());
+      if (customer_id)
+        info_data.append("invoice_customer_id", customer_id.toString());
       info_data.append("bill_to_id", billTo.id.toString());
-      info_data.append("file", file);
+      info_data.append("contracts", JSON.stringify(contracts_data));
+      info_data.append("pages", JSON.stringify(chosenPages));
+
+      if (file != undefined) info_data.append("file", file);
+
       info_data.append("with_taxes", with_taxes.toString());
       const requestHeaders: HeadersInit = new Headers();
       requestHeaders.set("Authorization", userService.userValue.token);
@@ -258,7 +268,10 @@ export const PostInvoiceModal = ({
 
             setInvoiceId("");
             setFile(undefined);
+            setContracts([]);
             setChooseBillTo(undefined);
+            setChosenPages([]);
+            setPages([])
           }
           setLoading(false);
         });
@@ -271,17 +284,32 @@ export const PostInvoiceModal = ({
   };
 
   style.width = 500;
-  const [value, setValue] = useState(0);
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [pages, setPages] = useState<string[]>([]);
+  const [chosenPages, setChosenPages] = useState<string[]>([]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
+  useEffect(() => {
+    get_pages();
+  }, [file]);
 
-  function a11yProps(index: number) {
-    return {
-      id: `simple-tab-${index}`,
-      "aria-controls": `simple-tabpanel-${index}`,
-    };
+  function get_pages() {
+    if (file != undefined) {
+      let info_data = new FormData();
+      info_data.append("file", file);
+
+      const requestHeaders: HeadersInit = new Headers();
+      requestHeaders.set("Authorization", userService.userValue.token);
+      window
+        .fetch(`/api/get_pages/`, {
+          method: "POST",
+          headers: requestHeaders,
+          body: info_data,
+        })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => setPages(data.pages));
+    }
   }
 
   return (
@@ -292,136 +320,167 @@ export const PostInvoiceModal = ({
       aria-describedby="modal-modal-description"
     >
       <Box component="form" sx={style}>
-        <Typography variant="h6" align="center" className="post-title">
-          Generar factura
-        </Typography>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            variant="fullWidth"
-            value={value}
-            onChange={handleChange}
-            aria-label="tabs"
-          >
-            <Tab label="Subir Archivo" {...a11yProps(0)} />
-            <Tab label="Generar" {...a11yProps(1)} />
-          </Tabs>
-        </Box>
-        <CustomTabPanel value={value} index={0}>
-          <Grid container spacing={2}>
-            {!model_id && (
-              <Grid item xs={12}>
-                <TextField
-                  label="ID factura"
-                  fullWidth
-                  value={invoice_id}
-                  onChange={handleSetInvoiceId}
-                  helperText="Número factura"
-                />
-              </Grid>
-            )}
-            {!model_id && (
-              <Grid item xs={12}>
-                <TextField
-                  label="Reason"
-                  fullWidth
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                />
-              </Grid>
-            )}
-            <Grid item xs={12}>
-              <InvoiceModalBillTo
-                billTos={billTos}
-                billTo={billTo}
-                setChooseBillTo={setChooseBillTo}
-                disabled={false}
+        <Grid item xs={12}>
+          <SeparatorWithText title="Factura" />
+        </Grid>
+        <Grid container spacing={2} mt={1}>
+          {!model_id && (
+            <Grid item xs={4}>
+              <TextField
+                label="ID*"
+                fullWidth
+                value={invoice_id}
+                onChange={handleSetInvoiceId}
+                helperText="Número factura"
               />
             </Grid>
-
-            <Grid item xs={12} sx={{ }}>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox checked={with_taxes} onChange={(e) => setWith_taxes(e.target.checked)}/>}
-                  label="Incluir impuestos?"
-                />
-              </FormGroup>
-            </Grid>
-
-            <Grid item xs={12}>
-              <hr />
-            </Grid>
-
-            <Grid item xs={6}>
-              <Button
-                variant="contained"
-                component="label"
+          )}
+          {!model_id && (
+            <Grid item xs={8}>
+              <TextField
+                label="Reason"
                 fullWidth
-                disabled={file != undefined}
-                sx={{
-                  height: "100%",
-                  backgroundColor: file ? "green" : "primary",
-                }}
-              >
-                Subir archivo
-                <input
-                  hidden
-                  type="file"
-                  name="myFile"
-                  onChange={uploadToClient}
-                />
-              </Button>
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+              />
             </Grid>
-            <Grid item xs={6}>
-              <Button
-                variant="contained"
-                onClick={postFile}
-                fullWidth
-                disabled={!file || loading}
-                sx={{ height: "100%" }}
-              >
-                Procesar archivo
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              {file && (
-                <Typography sx={{ fontStyle: "italic", color: "gray" }}>
-                  Archivo seleccionado: {file.name}
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={12}>
-              {error && (
-                <Typography color="error">
-                  Hubo un error procesando el archivo. Por favor, intenta de
-                  nuevo.
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sx={{ textAlign: "center" }}>
-              {loading && (
-                <Box display="flex" flexDirection="column" alignItems="center">
-                  <CircularProgress />
-                  <Typography variant="body1" mt={1}>
-                    Subiendo...
-                  </Typography>
-                </Box>
-              )}
-            </Grid>
+          )}
+          <Grid item xs={12}>
+            <InvoiceModalBillTo
+              billTos={billTos}
+              billTo={billTo}
+              setChooseBillTo={setChooseBillTo}
+              disabled={false}
+            />
           </Grid>
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          <InvoiceTabModal
-            customer_id={customer_id}
-            model_id={model_id}
-            number_id={number_id}
-            open={open}
-            handleClose={handleClose}
-            reload={reload}
-            tax_1={tax_1}
-            tax_2={tax_2}
-            billTos={billTos}
-          />
-        </CustomTabPanel>
+
+          <Grid item xs={12}>
+            <SeparatorWithText title="Contratos" />
+          </Grid>
+
+          <Grid item xs={12}>
+            <ContractSectionPanel
+              customer_id={customer_id}
+              model_id={model_id}
+              number_id={number_id}
+              open={open}
+              loading={loading}
+              contracts={contracts}
+              setContracts={setContracts}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <SeparatorWithText title="Opciones" />
+          </Grid>
+          <Grid item xs={12} sx={{}}>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={with_taxes}
+                    onChange={(e) => setWith_taxes(e.target.checked)}
+                  />
+                }
+                label="Incluir impuestos"
+              />
+            </FormGroup>
+          </Grid>
+
+          <Grid item xs={12}>
+            <SeparatorWithText title="Archivo" />
+          </Grid>
+
+          <Grid item xs={12}>
+            {pages.map((page, index) => (
+              <Chip
+                sx={{
+                  backgroundColor: chosenPages.find((p) => page == p)
+                    ? "green"
+                    : "",
+                  marginX: "2px",
+                }}
+                key={index}
+                label={page}
+                onClick={() => {
+                  if (chosenPages.includes(page)) {
+                    // If the item is present, remove it
+                    setChosenPages((prevChosenPages) =>
+                      prevChosenPages.filter((p) => p !== page)
+                    );
+                  } else {
+                    // If the item is not present, add it
+                    setChosenPages((prevChosenPages) => [
+                      ...prevChosenPages,
+                      page,
+                    ]);
+                  }
+                }}
+              />
+            ))}
+          </Grid>
+
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              component="label"
+              fullWidth
+              sx={{
+                height: "100%",
+                backgroundColor: file ? "green" : "primary",
+              }}
+            >
+              Subir archivo
+              <input
+                hidden
+                type="file"
+                name="myFile"
+                onChange={uploadToClient}
+              />
+            </Button>
+          </Grid>
+
+          <Grid item xs={12}>
+            <SeparatorWithText title="" />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              onClick={postFile}
+              fullWidth
+              disabled={loading}
+              sx={{ height: "100%" }}
+            >
+              Enviar
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            {file && (
+              <Typography sx={{ fontStyle: "italic", color: "gray" }}>
+                Archivo seleccionado: {file.name}
+              </Typography>
+            )}
+          </Grid>
+          <Grid item xs={12}>
+            {error && (
+              <Typography color="error">
+                Hubo un error procesando el archivo. Por favor, intenta de
+                nuevo.
+              </Typography>
+            )}
+          </Grid>
+          <Grid item xs={12} sx={{ textAlign: "center" }}>
+            {loading && (
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <CircularProgress />
+                <Typography variant="body1" mt={1}>
+                  Subiendo...
+                </Typography>
+              </Box>
+            )}
+          </Grid>
+        </Grid>
       </Box>
     </Modal>
   );

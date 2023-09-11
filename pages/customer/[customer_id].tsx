@@ -258,10 +258,14 @@ export default function EnhancedTable() {
       );
       file_url = row.files[row.files.length - 1].s3_pdf_url;
     }
-    let a_tax_1 = (row.tax_1 / 100) * subtotal;
-    let a_tax_2 = (row.tax_2 / 100) * subtotal;
-    a_tax_1 = parseFloat(a_tax_1.toFixed(2));
-    a_tax_2 = parseFloat(a_tax_2.toFixed(2));
+    let a_tax_1 = 0;
+    let a_tax_2 = 0;
+    if(row.with_taxes == undefined || row.with_taxes){
+      a_tax_1 = (row.tax_1 / 100) * subtotal;
+      a_tax_2 = (row.tax_2 / 100) * subtotal;
+      a_tax_1 = parseFloat(a_tax_1.toFixed(2));
+      a_tax_2 = parseFloat(a_tax_2.toFixed(2));
+    }
 
     let a_total = a_tax_1 + a_tax_2 + subtotal;
     a_total = parseFloat(a_total.toFixed(2));
