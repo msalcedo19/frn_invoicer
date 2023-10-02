@@ -9,7 +9,8 @@ import {
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 
-import { sendMessageAction, style, getHeaders } from "@/pages/index";
+import { sendMessageAction, style } from "@/pages/index";
+import { useDispatch } from "react-redux";
 
 interface PostFileModalProps {
   model_id: string | string[] | undefined;
@@ -37,6 +38,7 @@ export const ContractSectionPanel = (props: PostFileModalProps) => {
 
   style.width = 500;
 
+  const dispatch = useDispatch();
   function addContract() {
     if (contractTitle.length > 0 && parseFloat(contractAmount) > 0) {
       let newContract: Contract = {
