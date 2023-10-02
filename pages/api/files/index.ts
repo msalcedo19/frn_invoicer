@@ -10,7 +10,7 @@ export default async function handler(
   if (req.method === "POST") {
     // Process a POST request
     const postData = async () => {
-      const response = await fetch(`${API_ENDPOINT}/generate_pdf`, {
+      const response = await fetch(`${API_ENDPOINT}/summary`, {
         method: "POST",
         headers: getHeadersAPI(req),
         body: JSON.stringify(req.body),

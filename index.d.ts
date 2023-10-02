@@ -22,6 +22,7 @@ type TInvoice = {
   reason: string;
   tax_1: number;
   tax_2: number;
+  with_taxes: boolean;
   created: Date;
   updated: Date;
   customer_id: number;

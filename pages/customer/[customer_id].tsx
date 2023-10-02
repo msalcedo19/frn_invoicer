@@ -43,6 +43,7 @@ import { PostInvoiceModal } from "@/components/Invoice/InvoiceModal";
 import InvoiceOptionsDrawer from "@/components/Invoice/InvoiceOptionsDrawer";
 import InvoiceDeleteModal from "@/components/Invoice/InvoiceDeleteModal";
 import InvoiceEditable from "@/components/Invoice/InvoiceEditable";
+import { DatePickerModal } from "@/components/DatePickerModal";
 
 export default function EnhancedTable() {
   const [rows, setRows] = useState<TInvoice[]>([]);
@@ -56,6 +57,11 @@ export default function EnhancedTable() {
     query: { customer_id },
   } = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
+
+  const [openToDownload, setOpenToDownload] = useState(false);
+  const handleOpenToDownload= () => setOpenToDownload(true);
+  const handleCloseToDownload = () => setOpenToDownload(false);
+  const [fileData, setFileData] = useState<string | undefined>();
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -258,10 +264,14 @@ export default function EnhancedTable() {
       );
       file_url = row.files[row.files.length - 1].s3_pdf_url;
     }
-    let a_tax_1 = (row.tax_1 / 100) * subtotal;
-    let a_tax_2 = (row.tax_2 / 100) * subtotal;
-    a_tax_1 = parseFloat(a_tax_1.toFixed(2));
-    a_tax_2 = parseFloat(a_tax_2.toFixed(2));
+    let a_tax_1 = 0;
+    let a_tax_2 = 0;
+    if(row.with_taxes == undefined || row.with_taxes){
+      a_tax_1 = (row.tax_1 / 100) * subtotal;
+      a_tax_2 = (row.tax_2 / 100) * subtotal;
+      a_tax_1 = parseFloat(a_tax_1.toFixed(2));
+      a_tax_2 = parseFloat(a_tax_2.toFixed(2));
+    }
 
     let a_total = a_tax_1 + a_tax_2 + subtotal;
     a_total = parseFloat(a_total.toFixed(2));
@@ -293,6 +303,8 @@ export default function EnhancedTable() {
         onClose={handleCloseToDelete}
         onDelete={delete_obj}
       />
+      
+      <DatePickerModal open={openToDownload} handleClose={handleCloseToDownload} customer_id={customer_id} setFileData={setFileData} />
 
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
@@ -301,6 +313,9 @@ export default function EnhancedTable() {
             handleOpenToDelete={handleOpenToDelete}
             searchTerm={searchTerm}
             handleSearch={handleSearch}
+            handleOpenToDownload={handleOpenToDownload}
+            fileData={fileData}
+            setFileData={setFileData}
           />
           <TableContainer>
             <Table
