@@ -12,10 +12,12 @@ import {
   Tooltip,
   TextField,
   InputAdornment,
+  Button,
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { ChangeEvent } from "react";
+import DescriptionIcon from '@mui/icons-material/Description';
+import { ChangeEvent, Dispatch } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 
 function descendingComparator<T>(
@@ -124,7 +126,10 @@ const headCells: readonly HeadCell[] = [
 
 interface EnhancedTableProps {
   numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof TInvoice) => void;
+  onRequestSort: (
+    event: React.MouseEvent<unknown>,
+    property: keyof TInvoice
+  ) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
@@ -194,6 +199,9 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
 export interface EnhancedTableToolbarProps {
   numSelected: number;
   handleOpenToDelete: () => void;
+  handleOpenToDownload: () => void;
+  setFileData: Dispatch<React.SetStateAction<string | undefined>>;
+  fileData: string | undefined;
   searchTerm: string;
   handleSearch: (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -234,20 +242,24 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filtrar por número de factura">
-          <TextField
-            size="small"
-            value={props.searchTerm}
-            onChange={props.handleSearch}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Tooltip>
+        <div>
+          <Tooltip title="Filtrar por número de factura">
+            <TextField
+              size="small"
+              value={props.searchTerm}
+              onChange={props.handleSearch}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Tooltip>
+          <Button variant="contained" startIcon={<DescriptionIcon />} onClick={props.handleOpenToDownload}>Descargar Resumen</Button>
+          {props.fileData && <a href={props.fileData} download="downloaded-file.xlsx">Descargar archivo</a>}
+        </div>
       )}
     </Toolbar>
   );
