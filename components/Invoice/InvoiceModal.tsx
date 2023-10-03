@@ -140,6 +140,14 @@ export const PostInvoiceModal = ({
 
   const dispatch = useDispatch();
   function postFile() {
+    if(chosenPages.length == 0){
+      sendMessageAction(
+        "warning",
+        "Debes seleccionar al menos una hoja del excel y vuelve a intentarlo",
+        dispatch
+      );
+      return
+    }
     let contracts_data: Contract[] = [];
     contracts.forEach((contract_info) => {
       let contract_data: Contract = {
