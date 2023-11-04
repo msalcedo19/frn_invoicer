@@ -286,6 +286,14 @@ export default function EnhancedTable() {
     };
   }
 
+  function formatDateYearMonth(inputDate: string): string {
+    const dateParts = inputDate.split('-');
+    if (dateParts.length !== 3) {
+        return inputDate
+    }
+    return `${dateParts[0]}-${dateParts[1]}`;
+}
+
   return (
     <div>
       <PostInvoiceModal
@@ -293,6 +301,7 @@ export default function EnhancedTable() {
         customer_id={customer_id}
         number_id={undefined}
         create_new_invoice={true}
+        bill_to_id={undefined}
         open={open}
         handleClose={handleClose}
         reload={reload}
@@ -414,7 +423,7 @@ export default function EnhancedTable() {
                           </Grid>
                         </Link>
                       </TableCell>
-                      <TableCell align="center">{values.created}</TableCell>
+                      <TableCell align="center">{formatDateYearMonth(values.created)}</TableCell>
                       <TableCell align="center">{values.updated}</TableCell>
                     </TableRow>
                   );

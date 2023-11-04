@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DescriptionIcon from '@mui/icons-material/Description';
+import DescriptionIcon from "@mui/icons-material/Description";
 import { ChangeEvent, Dispatch } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -114,7 +114,7 @@ const headCells: readonly HeadCell[] = [
     id: "created",
     numeric: false,
     disablePadding: false,
-    label: "Fecha Creación",
+    label: "Periodo",
   },
   {
     id: "updated",
@@ -257,8 +257,36 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
               }}
             />
           </Tooltip>
-          <Button variant="contained" startIcon={<DescriptionIcon />} onClick={props.handleOpenToDownload}>Descargar Resumen</Button>
-          {props.fileData && <a href={props.fileData} download="downloaded-file.xlsx">Descargar archivo</a>}
+          <Button
+            variant="contained"
+            startIcon={<DescriptionIcon />}
+            disabled={props.fileData != undefined && props.fileData.length > 0}
+            onClick={props.handleOpenToDownload}
+          >
+            Descargar Resumen
+          </Button>
+          {props.fileData && (
+            <Button
+              variant="contained"
+              startIcon={<DescriptionIcon />}
+              component="a" // Render the Button as an anchor element
+              href={props.fileData} // Set the href to the file data URL
+              download="downloaded-file.xlsx" // Set the download attribute
+              disabled={!props.fileData} // Disable the button if props.fileData is falsy
+            >
+              Descargar archivo
+            </Button>
+          )}
+          {props.fileData && (
+            <Tooltip title="Delete File">
+              <Button
+                sx={{ color: "red" }}
+                onClick={() => props.setFileData(undefined)}
+              >
+                <DeleteIcon />
+              </Button>
+            </Tooltip>
+          )}
         </div>
       )}
     </Toolbar>

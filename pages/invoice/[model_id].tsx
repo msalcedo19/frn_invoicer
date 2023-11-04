@@ -32,6 +32,7 @@ const sortByDateAsc = (a: TFile, b: TFile) =>
 
 export default function CustomerDetail() {
   const [files, setFiles] = useState<TFile[]>([]);
+  const [billtoId, setBilltoId] = useState<number>();
   const {
     query: { model_id, customer_id, number_id },
   } = useRouter();
@@ -100,6 +101,9 @@ export default function CustomerDetail() {
         .then((data) => {
           if (data && data["files"]) {
             setFiles(data["files"].sort(sortByDateAsc));
+            if(data["files"].length > 0){
+              setBilltoId(data["files"][0].bill_to_id)
+            }
           }
           setLoading(false);
         });
@@ -126,6 +130,7 @@ export default function CustomerDetail() {
         customer_id={customer_id}
         number_id={number_id}
         create_new_invoice={false}
+        bill_to_id={billtoId}
         open={open}
         handleClose={handleClose}
         reload={reload}

@@ -33,6 +33,7 @@ interface PostFileModalProps {
   customer_id: string | string[] | undefined;
   number_id: string | string[] | undefined;
   create_new_invoice: boolean;
+  bill_to_id: number | undefined;
   open: boolean;
   handleClose: () => void;
   reload: () => void;
@@ -69,6 +70,7 @@ export const PostInvoiceModal = ({
   customer_id,
   number_id,
   create_new_invoice,
+  bill_to_id,
   open,
   handleClose,
   reload,
@@ -133,20 +135,19 @@ export const PostInvoiceModal = ({
       .then((data) => {
         if (data && data.length > 0) {
           setBillTos(data);
-          //setChooseBillTo(data[0]);
         }
       });
   }, [model_id]);
 
   const dispatch = useDispatch();
   function postFile() {
-    if(chosenPages.length == 0){
+    if (chosenPages.length == 0) {
       sendMessageAction(
         "warning",
         "Debes seleccionar al menos una hoja del excel y vuelve a intentarlo",
         dispatch
       );
-      return
+      return;
     }
     let contracts_data: Contract[] = [];
     contracts.forEach((contract_info) => {
@@ -222,7 +223,7 @@ export const PostInvoiceModal = ({
             setFile(undefined);
             setChooseBillTo(undefined);
             setChosenPages([]);
-            setPages([])
+            setPages([]);
             sendMessageAction(
               "success",
               "Se creó la factura correctamente",
@@ -277,7 +278,7 @@ export const PostInvoiceModal = ({
             setContracts([]);
             setChooseBillTo(undefined);
             setChosenPages([]);
-            setPages([])
+            setPages([]);
           }
           setLoading(false);
         });
@@ -297,6 +298,16 @@ export const PostInvoiceModal = ({
   useEffect(() => {
     get_pages();
   }, [file]);
+
+  useEffect(() => {
+    if (billTo == undefined)
+      for (let billto of billTos) {
+        if (billto.id == bill_to_id) {
+          setChooseBillTo(billto);
+          break;
+        }
+      }
+  }, [bill_to_id]);
 
   function get_pages() {
     if (file != undefined) {
@@ -356,7 +367,7 @@ export const PostInvoiceModal = ({
               billTos={billTos}
               billTo={billTo}
               setChooseBillTo={setChooseBillTo}
-              disabled={false}
+              disabled={billTo != undefined}
             />
           </Grid>
 

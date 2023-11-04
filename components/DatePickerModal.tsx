@@ -18,6 +18,7 @@ import {
   sendMessageAction,
   style,
 } from "@/pages/index";
+import CircularProgress from "@mui/material/CircularProgress";
 import SeparatorWithText from "@/components/Utils";
 import moment from "moment";
 import { useDispatch } from "react-redux";
@@ -37,7 +38,7 @@ interface PostFileModalProps {
 export const DatePickerModal = (props: PostFileModalProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(
-    dayjs(moment().subtract(180, "days").calendar())
+    dayjs(moment().subtract(30, "days").calendar())
   );
   const [endDate, setEndDate] = useState<dayjs.Dayjs>(dayjs(moment().format()));
   const [error, setError] = useState<boolean>(false);
@@ -45,19 +46,22 @@ export const DatePickerModal = (props: PostFileModalProps) => {
 
   const dispatch = useDispatch();
   function sendRequest() {
-    if(endDate.diff(startDate, 'day') > 31){
-      setMessage("No está permitido más de 31 días para generar el archivo. Por favor ajusta las fechas.")
-      setError(true)
+    if (endDate.diff(startDate, "day") > 31) {
+      setMessage(
+        "No está permitido más de 31 días para generar el archivo. Por favor ajusta las fechas."
+      );
+      setError(true);
     } else {
-      setError(false)
-      setMessage("")
+      setError(false);
+      setMessage("");
     }
+    setLoading(true)
     let data = {
       customer_id: props.customer_id,
-      start_date: startDate ? startDate.format('YYYY-MM-DD') : "",
-      end_date: endDate ? endDate.format('YYYY-MM-DD') : "",
+      start_date: startDate ? startDate.format("YYYY-MM-DD") : "",
+      end_date: endDate ? endDate.format("YYYY-MM-DD") : "",
     };
-    let requestHeaders = getHeaders(true)
+    let requestHeaders = getHeaders(true);
     requestHeaders.set("Accept", "application/octet-stream");
     window
       .fetch("/api/files", {
@@ -66,21 +70,27 @@ export const DatePickerModal = (props: PostFileModalProps) => {
         body: JSON.stringify(data),
       })
       .then((response) =>
-          processRequestToObj(
-            "error",
-            "Hubo un error procesando el archivo, por favor intentelo nuevamente",
-            dispatch,
-            response
-          )
+        processRequestToObj(
+          "error",
+          "Hubo un error procesando el archivo, por favor intentelo nuevamente",
+          dispatch,
+          response
         )
+      )
       .then((data) => {
-        console.log(data)
         if (data) {
           props.setFileData(data["s3_file_path"]);
           props.handleClose();
-          setStartDate(dayjs(moment().subtract(180, "days").calendar()));
+          setStartDate(dayjs(moment().subtract(30, "days").calendar()));
           setEndDate(dayjs(moment().format()));
+        } else {
+          setMessage(
+            "Hubo un error al generar el archivo. Contacte al administrador"
+          );
+          setError(true);
         }
+
+        setLoading(false)
       });
   }
 
@@ -100,13 +110,15 @@ export const DatePickerModal = (props: PostFileModalProps) => {
             <Grid item xs={6}>
               <DatePicker
                 value={dayjs(startDate)}
-                onChange={(newValue) => newValue ? setStartDate(newValue) : ""}
+                onChange={(newValue) =>
+                  newValue ? setStartDate(newValue) : ""
+                }
               />
             </Grid>
             <Grid item xs={6}>
               <DatePicker
                 value={dayjs(endDate)}
-                onChange={(newValue) => newValue ? setEndDate(newValue) : ""}
+                onChange={(newValue) => (newValue ? setEndDate(newValue) : "")}
               />
             </Grid>
 
@@ -123,10 +135,16 @@ export const DatePickerModal = (props: PostFileModalProps) => {
             </Grid>
 
             <Grid item xs={12}>
-            {error && (
-              <Typography color="error">
-                {message}
-              </Typography>
+              {error && <Typography color="error">{message}</Typography>}
+            </Grid>
+            <Grid item xs={12} sx={{ textAlign: "center" }}>
+            {loading && (
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <CircularProgress />
+                <Typography variant="body1" mt={1}>
+                  Generando...
+                </Typography>
+              </Box>
             )}
           </Grid>
           </Grid>
