@@ -141,7 +141,7 @@ export const PostInvoiceModal = ({
 
   const dispatch = useDispatch();
   function postFile() {
-    if (chosenPages.length == 0) {
+    if (file && chosenPages.length == 0) {
       sendMessageAction(
         "warning",
         "Debes seleccionar al menos una hoja del excel y vuelve a intentarlo",
