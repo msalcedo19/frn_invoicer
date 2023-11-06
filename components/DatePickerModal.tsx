@@ -88,6 +88,7 @@ export const DatePickerModal = (props: PostFileModalProps) => {
             "Hubo un error al generar el archivo. Contacte al administrador"
           );
           setError(true);
+          props.handleClose();
         }
 
         setLoading(false)
