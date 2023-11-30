@@ -5,12 +5,6 @@ import {
   Grid,
   Modal,
   Typography,
-  Tabs,
-  Tab,
-  FormGroup,
-  Checkbox,
-  FormControlLabel,
-  Chip,
 } from "@mui/material";
 import {
   getHeaders,
@@ -78,7 +72,8 @@ export const DatePickerModal = (props: PostFileModalProps) => {
         )
       )
       .then((data) => {
-        if (data) {
+        console.log(data)
+        if (data && data["detail"] != "Hubo un error generanto el resumen") {
           props.setFileData(data["s3_file_path"]);
           props.handleClose();
           setStartDate(dayjs(moment().subtract(30, "days").calendar()));
@@ -88,10 +83,10 @@ export const DatePickerModal = (props: PostFileModalProps) => {
             "Hubo un error al generar el archivo. Contacte al administrador"
           );
           setError(true);
-          props.handleClose();
+          //props.handleClose();
         }
-
         setLoading(false)
+
       });
   }
 

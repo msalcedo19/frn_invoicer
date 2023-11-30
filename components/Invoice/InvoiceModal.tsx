@@ -5,8 +5,6 @@ import {
   Grid,
   Modal,
   Typography,
-  Tabs,
-  Tab,
   FormGroup,
   Checkbox,
   FormControlLabel,
@@ -172,8 +170,6 @@ export const PostInvoiceModal = ({
         tax_1: tax_1 ? +tax_1.value : undefined,
         tax_2: tax_2 ? +tax_2.value : undefined,
         with_taxes: with_taxes,
-        created: new Date().toISOString(),
-        updated: new Date().toISOString(),
         customer_id: customer_id,
       };
 

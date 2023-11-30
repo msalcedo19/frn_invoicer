@@ -9,7 +9,7 @@ import Checkbox from "@mui/material/Checkbox";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import BackupTableIcon from "@mui/icons-material/BackupTable";
-import { Dispatch, SetStateAction, Fragment } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 const iconButtonStyles = {
   width: 128,
