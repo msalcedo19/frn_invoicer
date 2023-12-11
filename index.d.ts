@@ -6,6 +6,11 @@ type TCustomer = {
   number;
 };
 
+type TotalAndCustomer = {
+  total: number;
+  customers: TCustomer[];
+};
+
 type TContract = {
   id: number;
   title: str;
@@ -31,6 +36,11 @@ type TInvoice = {
   total: string;
   subtotal: string;
   last_invoice: string;
+};
+
+type TotalAndInvoices = {
+  total: number;
+  invoices: TInvoice[];
 };
 
 type TFile = {

@@ -52,14 +52,14 @@ export default function PostModal(props: ModalProps) {
             response
           )
         )
-        .then((data) => {
+        .then((data: TCustomer) => {
           if (data) {
             props.reload();
             handleClose();
             setName("");
             sendMessageAction(
               "success",
-              "Se creó el cliente correctamente",
+              `Se creó ${data.name} correctamente`,
               dispatch
             );
           }

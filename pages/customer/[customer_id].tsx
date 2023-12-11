@@ -48,6 +48,7 @@ import { DatePickerModal } from "@/components/DatePickerModal";
 export default function EnhancedTable() {
   const [rows, setRows] = useState<TInvoice[]>([]);
   const [rowsBackUp, setRowsBackUp] = useState<TInvoice[]>([]);
+  const [totalRows, setTotalRows] = useState(0);
   const [order, setOrder] = React.useState<Order>("desc");
   const [orderBy, setOrderBy] = React.useState<keyof TInvoice>("number_id");
   const [selected, setSelected] = React.useState<readonly number[]>([]);
@@ -59,9 +60,10 @@ export default function EnhancedTable() {
   const [loading, setLoading] = useState<boolean>(true);
 
   const [openToDownload, setOpenToDownload] = useState(false);
-  const handleOpenToDownload= () => setOpenToDownload(true);
+  const handleOpenToDownload = () => setOpenToDownload(true);
   const handleCloseToDownload = () => setOpenToDownload(false);
   const [fileData, setFileData] = useState<string | undefined>();
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -199,9 +201,11 @@ export default function EnhancedTable() {
   }
 
   function reload() {
+    setRows([]);
+    setLoading(true);
     if (customer_id)
       window
-        .fetch(`/api/customer/${customer_id}`, {
+        .fetch(`/api/customer/${customer_id}/invoice`, {
           method: "GET",
           headers: getHeaders(),
         })
@@ -213,10 +217,11 @@ export default function EnhancedTable() {
             response
           )
         )
-        .then((data) => {
-          if (data && data["invoices"]) {
-            setRows(data["invoices"]);
-            setRowsBackUp(data["invoices"]);
+        .then((data: TotalAndInvoices) => {
+          if (data) {
+            setRows(data.invoices);
+            setRowsBackUp(data.invoices);
+            setTotalRows(data.total);
           }
           setLoading(false);
         });
@@ -266,7 +271,7 @@ export default function EnhancedTable() {
     }
     let a_tax_1 = 0;
     let a_tax_2 = 0;
-    if(row.with_taxes == undefined || row.with_taxes){
+    if (row.with_taxes == undefined || row.with_taxes) {
       a_tax_1 = (row.tax_1 / 100) * subtotal;
       a_tax_2 = (row.tax_2 / 100) * subtotal;
       a_tax_1 = parseFloat(a_tax_1.toFixed(2));
@@ -287,12 +292,12 @@ export default function EnhancedTable() {
   }
 
   function formatDateYearMonth(inputDate: string): string {
-    const dateParts = inputDate.split('-');
+    const dateParts = inputDate.split("-");
     if (dateParts.length !== 3) {
-        return inputDate
+      return inputDate;
     }
     return `${dateParts[0]}-${dateParts[1]}`;
-}
+  }
 
   return (
     <div>
@@ -312,8 +317,13 @@ export default function EnhancedTable() {
         onClose={handleCloseToDelete}
         onDelete={delete_obj}
       />
-      
-      <DatePickerModal open={openToDownload} handleClose={handleCloseToDownload} customer_id={customer_id} setFileData={setFileData} />
+
+      <DatePickerModal
+        open={openToDownload}
+        handleClose={handleCloseToDownload}
+        customer_id={customer_id}
+        setFileData={setFileData}
+      />
 
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
@@ -355,7 +365,10 @@ export default function EnhancedTable() {
                         !isEditable &&
                         router.push({
                           pathname: `/invoice/${row.id}`,
-                          query: { customer_id: customer_id, number_id: row.number_id},
+                          query: {
+                            customer_id: customer_id,
+                            number_id: row.number_id,
+                          },
                         })
                       }
                       role="checkbox"
@@ -423,7 +436,9 @@ export default function EnhancedTable() {
                           </Grid>
                         </Link>
                       </TableCell>
-                      <TableCell align="center">{formatDateYearMonth(values.created)}</TableCell>
+                      <TableCell align="center">
+                        {formatDateYearMonth(values.created)}
+                      </TableCell>
                       <TableCell align="center">{values.updated}</TableCell>
                     </TableRow>
                   );
@@ -465,7 +480,7 @@ export default function EnhancedTable() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={rows.length}
+            count={totalRows}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

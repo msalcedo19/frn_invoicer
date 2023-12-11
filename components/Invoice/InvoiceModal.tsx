@@ -10,6 +10,8 @@ import {
   FormControlLabel,
   Chip,
 } from "@mui/material";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 
@@ -43,26 +45,6 @@ interface TabPanelProps {
   value: number;
 }
 
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
 export const PostInvoiceModal = ({
   model_id,
   customer_id,
@@ -86,6 +68,7 @@ export const PostInvoiceModal = ({
   const [billTo, setChooseBillTo] = useState<TBillTo>();
 
   const [with_taxes, setWith_taxes] = useState<boolean>(true);
+  const [with_tables, setWith_tables] = useState<boolean>(true);
 
   const uploadToClient = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -170,6 +153,7 @@ export const PostInvoiceModal = ({
         tax_1: tax_1 ? +tax_1.value : undefined,
         tax_2: tax_2 ? +tax_2.value : undefined,
         with_taxes: with_taxes,
+        with_tables: with_tables,
         customer_id: customer_id,
       };
 
@@ -180,6 +164,7 @@ export const PostInvoiceModal = ({
       info_data.append("pages", JSON.stringify(chosenPages));
       if (file != undefined) info_data.append("file", file);
       info_data.append("with_taxes", with_taxes.toString());
+      info_data.append("with_tables", with_tables.toString());
       const requestHeaders: HeadersInit = new Headers();
       requestHeaders.set("Authorization", userService.userValue.token);
 
@@ -243,6 +228,7 @@ export const PostInvoiceModal = ({
       if (file != undefined) info_data.append("file", file);
 
       info_data.append("with_taxes", with_taxes.toString());
+      info_data.append("with_tables", with_tables.toString());
       const requestHeaders: HeadersInit = new Headers();
       requestHeaders.set("Authorization", userService.userValue.token);
       window
@@ -272,7 +258,6 @@ export const PostInvoiceModal = ({
             setInvoiceId("");
             setFile(undefined);
             setContracts([]);
-            setChooseBillTo(undefined);
             setChosenPages([]);
             setPages([]);
           }
@@ -368,25 +353,34 @@ export const PostInvoiceModal = ({
           </Grid>
 
           <Grid item xs={12}>
-            <SeparatorWithText title="Contratos" />
-          </Grid>
-
-          <Grid item xs={12}>
-            <ContractSectionPanel
-              customer_id={customer_id}
-              model_id={model_id}
-              number_id={number_id}
-              open={open}
-              loading={loading}
-              contracts={contracts}
-              setContracts={setContracts}
-            />
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <SeparatorWithText title="Contratos" />
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid item xs={12}>
+                  <ContractSectionPanel
+                    customer_id={customer_id}
+                    model_id={model_id}
+                    number_id={number_id}
+                    open={open}
+                    loading={loading}
+                    contracts={contracts}
+                    setContracts={setContracts}
+                  />
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
           </Grid>
 
           <Grid item xs={12}>
             <SeparatorWithText title="Opciones" />
           </Grid>
-          <Grid item xs={12} sx={{}}>
+          <Grid item xs={6} sx={{}}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -396,6 +390,19 @@ export const PostInvoiceModal = ({
                   />
                 }
                 label="Incluir impuestos"
+              />
+            </FormGroup>
+          </Grid>
+          <Grid item xs={6} sx={{}}>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={with_tables}
+                    onChange={(e) => setWith_tables(e.target.checked)}
+                  />
+                }
+                label="Incluir tablas"
               />
             </FormGroup>
           </Grid>

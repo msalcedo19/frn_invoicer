@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import Toolbar from "@mui/material/Toolbar";
 import { userService } from "@/src/user";
 const styles = {
@@ -39,16 +39,22 @@ export default function Navbar() {
   return (
     <AppBar position="static" style={styles.appBar}>
       <Toolbar style={styles.toolbar}>
-        <Typography variant="h6" component="a" href="/" style={styles.logo}>
-          Invoicer
-        </Typography>
+        <Link href="/" passHref>
+          <Typography variant="h6" style={styles.logo}>
+            Invoicer
+          </Typography>
+        </Link>
         <div>
-          <Button style={styles.navLink}>
-            <Link href="/customer">Clientes</Link>
-          </Button>
-          <Button style={styles.navLink}>
-            <Link href="/variable">Variables</Link>
-          </Button>
+          <Link href="/customer" passHref>
+            <Button style={styles.navLink} component="a">
+              Clientes
+            </Button>
+          </Link>
+          <Link href="/variable" passHref>
+            <Button style={styles.navLink} component="a">
+              Variables
+            </Button>
+          </Link>
           <Button style={styles.navLink} onClick={userService.logout}>
             Log out
           </Button>

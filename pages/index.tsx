@@ -78,6 +78,7 @@ export function processRequest(
     return undefined
   } else if (response.status < 200 || response.status >= 400) {
     if (userService.userValue) sendMessageAction(severity, message, dispatch);
+    return undefined
   }
   return response.json();
 }
@@ -105,6 +106,7 @@ export function processRequestToObj(
     return undefined
   } else if (response.status < 200 || response.status >= 400) {
     if (userService.userValue) sendMessageAction(severity, message, dispatch);
+    return undefined;
   }
   return response.json();
 }

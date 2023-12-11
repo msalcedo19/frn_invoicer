@@ -9,6 +9,7 @@ import {
   Paper,
   Checkbox,
   LinearProgress,
+  IconButton,
 } from "@mui/material";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
@@ -38,16 +39,19 @@ import {
   Order,
   EnhancedTableToolbar,
 } from "@/components/Customer/CustomerTableUtils";
+import { ReplayCircleFilledOutlined } from "@mui/icons-material";
 
 export default function EnhancedTable() {
   const [rows, setRows] = useState<TCustomer[]>([]);
   const [rowsBackUp, setRowsBackUp] = useState<TCustomer[]>([]);
+  const [totalRows, setTotalRows] = useState(0);
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof TCustomer>("name");
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -103,7 +107,7 @@ export default function EnhancedTable() {
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - totalRows) : 0;
 
   const visibleRows = React.useMemo(
     () =>
@@ -185,6 +189,9 @@ export default function EnhancedTable() {
   }
 
   function reload() {
+    setLoading(true);
+    setError(false);
+    setRows([])
     window
       .fetch(`/api/customer`, {
         method: "GET",
@@ -198,10 +205,13 @@ export default function EnhancedTable() {
           response
         )
       )
-      .then((data) => {
+      .then((data: TotalAndCustomer) => {
         if (data) {
-          setRows(data);
-          setRowsBackUp(data);
+          setRows(data.customers);
+          setRowsBackUp(data.customers);
+          setTotalRows(data.total);
+        } else {
+          setError(true);
         }
         setLoading(false);
       });
@@ -328,9 +338,23 @@ export default function EnhancedTable() {
                       height: 53,
                     }}
                   >
-                    <TableCell colSpan={7} align="center">
-                      Aún no se ha creado ningún cliente
-                    </TableCell>
+                    {!error && (
+                      <TableCell colSpan={7} align="center">
+                        Aún no se ha creado ningún cliente
+                      </TableCell>
+                    )}
+                    {error && (
+                      <TableCell
+                        colSpan={7}
+                        align="center"
+                        sx={{ color: "red" }}
+                      >
+                        Hubo un error cargando los datos. Intentelo nuevamente
+                        <IconButton onClick={reload}>
+                          <ReplayCircleFilledOutlined />
+                        </IconButton>
+                      </TableCell>
+                    )}
                   </TableRow>
                 )}
                 {rows.length == 0 && loading && (
@@ -349,7 +373,7 @@ export default function EnhancedTable() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={rows.length}
+            count={totalRows}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

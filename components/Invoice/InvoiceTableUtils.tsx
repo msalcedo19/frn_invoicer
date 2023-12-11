@@ -257,14 +257,6 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
               }}
             />
           </Tooltip>
-          <Button
-            variant="contained"
-            startIcon={<DescriptionIcon />}
-            disabled={props.fileData != undefined && props.fileData.length > 0}
-            onClick={props.handleOpenToDownload}
-          >
-            Descargar Resumen
-          </Button>
           {props.fileData && (
             <Button
               variant="contained"

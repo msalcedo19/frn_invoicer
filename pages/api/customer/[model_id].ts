@@ -23,7 +23,9 @@ export default async function handler(
   } else if (req.method == "GET") {
     // Handle any other HTTP method
     const getData = async () => {
-      const response = await fetch(`${API_ENDPOINT}/customer/${model_id}`, {
+      const url = new URL(`${API_ENDPOINT}/customer/${model_id}`);
+
+      const response = await fetch(url.toString(), {
         method: "GET",
         headers: getHeadersAPI(req),
       });

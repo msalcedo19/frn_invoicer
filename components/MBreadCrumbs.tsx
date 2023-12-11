@@ -1,12 +1,10 @@
 import * as React from "react";
-import Typography from "@mui/material/Typography";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Link from "@mui/material/Link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/src/reducers/rootReducer";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
-import { Box } from "@mui/material";
+import { Box, Breadcrumbs, Typography, Link as MuiLink } from '@mui/material';
+import Link from 'next/link';
 
 const RefreshButton = styled(Button)({
   backgroundColor: "#1976d2",
@@ -29,14 +27,11 @@ export default function BasicBreadcrumbs() {
               {option.value}
             </Typography>
           ) : (
-            <Link
-              key={option.href}
-              underline="hover"
-              color="inherit"
-              href={option.href}
-            >
+            <Link key={option.href} href={option.href} passHref>
+            <MuiLink underline="hover" color="inherit">
               {option.value}
-            </Link>
+            </MuiLink>
+          </Link>
           )
         )}
       </Breadcrumbs>
