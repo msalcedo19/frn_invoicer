@@ -218,7 +218,7 @@ export default function EnhancedTable() {
           )
         )
         .then((data: TotalAndInvoices) => {
-          if (data) {
+          if (data && data.invoices) {
             setRows(data.invoices);
             setRowsBackUp(data.invoices);
             setTotalRows(data.total);
@@ -280,6 +280,7 @@ export default function EnhancedTable() {
 
     let a_total = a_tax_1 + a_tax_2 + subtotal;
     a_total = parseFloat(a_total.toFixed(2));
+    subtotal = parseFloat(subtotal.toFixed(2));
     return {
       total: a_total,
       subtotal: subtotal,

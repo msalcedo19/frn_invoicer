@@ -206,7 +206,7 @@ export default function EnhancedTable() {
         )
       )
       .then((data: TotalAndCustomer) => {
-        if (data) {
+        if (data && data.customers) {
           setRows(data.customers);
           setRowsBackUp(data.customers);
           setTotalRows(data.total);
